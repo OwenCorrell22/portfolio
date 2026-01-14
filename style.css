@@ -1,8 +1,135 @@
 * {
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #f8f8f6;
+  color: #4a4a4a;
+  font-size: 1.4rem;
+  display: flex;
+}
+
+nav {
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  padding-top: 3rem;
+  z-index: 100;
+}
+
+.name {
+  color: #4a4a4a;
+  text-decoration: none;
+  margin-bottom: 3rem;
+  transition: opacity 0.2s ease;
+}
+
+.name:hover {
+  opacity: 0.6;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: #4a4a4a;
+  text-decoration: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  display: inline-block;
+  width: fit-content;
+}
+
+.nav-links a:hover {
+  transform: translateX(0.625rem);
+  opacity: 0.6;
+}
+
+main {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  opacity: 0;
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+.contact-list p {
+  color: #1a1a1a;
+  font-size: 1rem;
+}
+
+.contact-list a {
+  color: #6a6a6a;
+  text-decoration: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  display: inline-block;
+  width: fit-content;
+  font-size: 1rem;
+}
+
+.contact-list a:hover {
+  transform: translateX(0.625rem);
+  opacity: 0.6;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.about-photo {
+  max-width: 40vw;
+  width: 100%;
+  opacity: 0;
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+.about-content p {
+  color: #6a6a6a;
+  font-size: 0.95rem;
+  max-width: 30rem;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
   }
-  
-  body {
-    margin: 0;
-    font-family: sans-serif;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
   }
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}

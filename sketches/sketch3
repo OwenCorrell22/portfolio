@@ -1,0 +1,20 @@
+let col;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  frameRate(60);
+  noStroke();
+  background(0);
+}
+
+function draw() {
+  for (let i = 0; i < 6; i++) {
+    col = color(random(255), random(255), random(255));
+    fill(col);
+    ellipse(
+      random(width),
+      random(height),
+      random(35, 75)
+    );
+  }
+}

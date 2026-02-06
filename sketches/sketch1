@@ -1,0 +1,214 @@
+let cols = 12, rows = 8;
+let attractX = 0, attractY = 0;
+let t = 0;
+let col1, col2;
+let trails = true;
+let jitter = 14;
+
+let pts = []; // per-dot motion states
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  strokeWeight(2.5);
+  noFill();
+  col1 = color(random(255), random(255), random(255));
+  col2 = color(random(255), random(255), random(255));
+  attractX = width / 2;
+  attractY = height / 2;
+
+  initPoints();
+}
+
+function initPoints() {
+  pts = new Array(cols);
+  for (let i = 0; i < cols; i++) {
+    pts[i] = new Array(rows);
+    for (let j = 0; j < rows; j++) {
+      pts[i][j] = makePointState();
+    }
+  }
+}
+
+function makePointState() {
+  // current movement segment
+  const now = millis();
+  const dur = random(900, 1800); // fade time between locations (ms)
+  const next = now + random(1000, 5000); // change target every 1–5 sec
+
+  // start at some random offset
+  const a = random(TAU);
+  const r = random(0.2, 1.0);
+  const ox = cos(a) * r;
+  const oy = sin(a) * r;
+
+  // choose first target
+  const a2 = random(TAU);
+  const r2 = random(0.2, 1.0);
+  const tox = cos(a2) * r2;
+  const toy = sin(a2) * r2;
+
+  return {
+    fromX: ox, fromY: oy,
+    toX: tox, toY: toy,
+    start: now,
+    dur: dur,
+    nextChange: next,
+    fadeSpeed: random(0.3, 1.2),
+    fadeOffset: random(TAU)
+  };
+}
+
+function easeInOutCubic(x) {
+  x = constrain(x, 0, 1);
+  return x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2;
+}
+
+function updatePointState(p) {
+  const now = millis();
+
+  // if it's time to pick a new destination (independent per dot)
+  if (now >= p.nextChange) {
+    // set current "from" to wherever we are right now
+    const prog = (now - p.start) / p.dur;
+    const e = easeInOutCubic(prog);
+    const curX = lerp(p.fromX, p.toX, e);
+    const curY = lerp(p.fromY, p.toY, e);
+
+    p.fromX = curX;
+    p.fromY = curY;
+
+    // new target
+    const a2 = random(TAU);
+    const r2 = random(0.2, 1.0);
+    p.toX = cos(a2) * r2;
+    p.toY = sin(a2) * r2;
+
+    // new timing
+    p.start = now;
+    p.dur = random(700, 1600);         // how long it takes to fade to new spot
+    p.nextChange = now + random(1000, 5000); // next jump in 1–5s
+  }
+}
+
+function getPointOffset(p) {
+  const now = millis();
+  const prog = (now - p.start) / p.dur;
+  const e = easeInOutCubic(prog);
+  return {
+    x: lerp(p.fromX, p.toX, e),
+    y: lerp(p.fromY, p.toY, e)
+  };
+}
+
+function radiantBackground(alpha) {
+  // alpha controls trail fade strength
+  const ctx = drawingContext;
+
+  // center the glow a bit toward the attract point (feels “alive”)
+  const cx = lerp(width * 0.5, attractX, 0.35);
+  const cy = lerp(height * 0.5, attractY, 0.35);
+
+  const r0 = min(width, height) * 0.08;
+  const r1 = max(width, height) * 0.75;
+
+  const g = ctx.createRadialGradient(cx, cy, r0, cx, cy, r1);
+
+  // use your palette but keep it dark enough to read the lines
+  // (slightly desaturated + alpha for trails)
+  const cA = color(red(col1) * 0.55, green(col1) * 0.55, blue(col1) * 0.55, alpha);
+  const cB = color(red(col2) * 0.45, green(col2) * 0.45, blue(col2) * 0.45, alpha);
+  const cEdge = color(0, 0, 0, alpha);
+
+  g.addColorStop(0.0, `rgba(${red(cA)},${green(cA)},${blue(cA)},${alpha / 255})`);
+  g.addColorStop(0.45, `rgba(${red(cB)},${green(cB)},${blue(cB)},${alpha / 255})`);
+  g.addColorStop(1.0, `rgba(0,0,0,${alpha / 255})`);
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+}
+
+function draw() {
+  // background (radiant + trailing)
+  if (trails) {
+    radiantBackground(28); // smaller = longer trails, bigger = faster fade
+  } else {
+    radiantBackground(255);
+  }
+
+  // smooth follow toward the mouse
+  attractX = lerp(attractX, mouseX, 0.12);
+  attractY = lerp(attractY, mouseY, 0.12);
+
+  // glow lines
+  blendMode(ADD);
+
+  for (let i = 0; i < cols; i++) {
+    // animated gradient along columns
+    let mix = (i / max(1, cols - 1));
+    let wobble = 0.5 + 0.5 * sin(t + i * 0.3);
+    let c = lerpColor(col1, col2, constrain(mix * 0.7 + wobble * 0.3, 0, 1));
+    stroke(red(c), green(c), blue(c), 190);
+
+    for (let j = 0; j < rows; j++) {
+      // base grid point
+      let gx = map(i, 0, cols - 1, 0, width);
+      let gy = map(j, 0, rows - 1, 0, height);
+
+      // update / get this dot’s drifting offset
+      let p = pts[i][j];
+      updatePointState(p);
+      let off = getPointOffset(p);
+
+      // scale offset by distance from mouse (more drift farther away)
+      let d2m = dist(gx, gy, attractX, attractY);
+      let localJitter = jitter * (0.8 + 0.001 * (width + height - d2m));
+      localJitter = constrain(localJitter, jitter * 0.6, jitter * 1.8);
+
+      // final position
+      let jx = gx + off.x * localJitter;
+      let jy = gy + off.y * localJitter;
+
+      // per-dot fade
+      let fade = 0.5 + 0.5 * sin(t * p.fadeSpeed + p.fadeOffset);
+      let a = fade * 190;
+
+      stroke(red(c), green(c), blue(c), a);
+
+      // slight pulse on proximity
+      let near = constrain(map(d2m, 0, min(width, height) * 0.5, 1.4, 0.8), 0.8, 1.4);
+      strokeWeight(2.5 * near);
+
+      line(jx, jy, attractX, attractY);
+    }
+  }
+
+  blendMode(BLEND);
+  t += 0.01;
+}
+
+function mousePressed() {
+  // new palette on click
+  col1 = color(random(255), random(255), random(255));
+  col2 = color(random(255), random(255), random(255));
+}
+
+function mouseWheel(e) {
+  // wheel up/down to change density
+  let delta = e.delta > 0 ? -1 : 1;
+  cols = constrain(cols + delta, 4, 40);
+  rows = constrain(rows + delta, 3, 30);
+  jitter = constrain(jitter + delta * 1.2, 4, 28);
+  initPoints(); // IMPORTANT: rebuild per-dot timers when grid changes
+}
+
+function keyPressed() {
+  if (key === ' ') trails = !trails; // toggle trails
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  initPoints(); // rebuild for new dimensions
+}

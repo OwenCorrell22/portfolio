@@ -1,133 +1,130 @@
-// ===========================
-// Constantly Changing ID Tags Animation
-// ===========================
-
-document.addEventListener('DOMContentLoaded', () => {
-  const navIds = document.querySelectorAll('.nav-id');
-  const hexChars = '0123456789ABCDEF';
-
-  function getRandomHexChar() {
-    return hexChars[Math.floor(Math.random() * hexChars.length)];
-  }
-
-  navIds.forEach((idSpan) => {
-    const baseId = idSpan.getAttribute('data-base');
-    let currentId = baseId.split('');
-
-    // First digit stays static
-    // Second digit changes slowly (800ms)
-    setInterval(() => {
-      currentId[1] = getRandomHexChar();
-      idSpan.textContent = currentId.join('');
-    }, 800);
-
-    // Third digit changes medium speed (400ms)
-    setInterval(() => {
-      currentId[2] = getRandomHexChar();
-      idSpan.textContent = currentId.join('');
-    }, 400);
-
-    // Fourth digit changes fastest (80ms)
-    setInterval(() => {
-      currentId[3] = getRandomHexChar();
-      idSpan.textContent = currentId.join('');
-    }, 80);
+(function() {
+  document.addEventListener('DOMContentLoaded', () => {
+    initHexAnimation();
+    initWorkToggle();
+    initPhotoGallery();
+    initPageTransitions();
   });
-});
 
-// ===========================
-// Work Submenu Toggle
-// ===========================
+  // ===========================
+  // Hex ID Animation (rAF-batched)
+  // ===========================
 
-document.addEventListener('DOMContentLoaded', () => {
-  const workToggle = document.querySelector('.work-toggle');
-  const subLinks = document.querySelector('.sub-links');
+  function initHexAnimation() {
+    const navIds = document.querySelectorAll('.nav-id');
+    if (!navIds.length) return;
 
-  if (workToggle && subLinks) {
-    workToggle.addEventListener('click', function() {
-      subLinks.classList.toggle('expanded');
-    });
-  }
-});
+    const hexChars = '0123456789ABCDEF';
+    const intervals = [0, 800, 400, 80];
+    const state = [];
 
-// ===========================
-// Photo Fade In on Scroll
-// ===========================
+    for (let i = 0; i < navIds.length; i++) {
+      state.push({
+        el: navIds[i],
+        chars: navIds[i].getAttribute('data-base').split(''),
+        lastUpdate: [0, 0, 0, 0]
+      });
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const photos = document.querySelectorAll('.photo-gallery img');
-  if (!photos.length) return;
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
+    function tick(timestamp) {
+      for (let i = 0; i < state.length; i++) {
+        const s = state[i];
+        let changed = false;
+        for (let d = 1; d < 4; d++) {
+          if (timestamp - s.lastUpdate[d] >= intervals[d]) {
+            s.chars[d] = hexChars[(Math.random() * 16) | 0];
+            s.lastUpdate[d] = timestamp;
+            changed = true;
+          }
+        }
+        if (changed) {
+          s.el.textContent = s.chars.join('');
+        }
       }
-    });
-  }, { threshold: 0.1 });
+      requestAnimationFrame(tick);
+    }
 
-  photos.forEach(img => observer.observe(img));
-});
+    requestAnimationFrame(tick);
+  }
 
-// ===========================
-// Photo Lightbox
-// ===========================
+  // ===========================
+  // Work Submenu Toggle
+  // ===========================
 
-document.addEventListener('DOMContentLoaded', () => {
-  const galleryImages = document.querySelectorAll('.photo-gallery img');
-  if (!galleryImages.length) return;
+  function initWorkToggle() {
+    const workToggle = document.querySelector('.work-toggle');
+    const subLinks = document.querySelector('.sub-links');
+    if (workToggle && subLinks) {
+      workToggle.addEventListener('click', () => subLinks.classList.toggle('expanded'));
+    }
+  }
 
-  // Create overlay
-  const overlay = document.createElement('div');
-  overlay.classList.add('lightbox-overlay');
-  document.body.appendChild(overlay);
+  // ===========================
+  // Photo Gallery (Fade-in + Lightbox)
+  // ===========================
 
-  // Create expanded image
-  const lightboxImg = document.createElement('img');
-  lightboxImg.classList.add('lightbox-img');
-  overlay.appendChild(lightboxImg);
+  function initPhotoGallery() {
+    const images = document.querySelectorAll('.photo-gallery img');
+    if (!images.length) return;
 
-  galleryImages.forEach(img => {
-    img.style.cursor = 'pointer';
-    img.addEventListener('click', () => {
-      lightboxImg.src = img.src;
-      overlay.classList.add('active');
-    });
-  });
+    // Fade-in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      for (let i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) {
+          entries[i].target.classList.add('visible');
+          observer.unobserve(entries[i].target);
+        }
+      }
+    }, { threshold: 0.1 });
 
-  overlay.addEventListener('click', (e) => {
-    if (e.target !== lightboxImg) {
+    for (let i = 0; i < images.length; i++) {
+      observer.observe(images[i]);
+    }
+
+    // Lightbox
+    const overlay = document.createElement('div');
+    overlay.className = 'lightbox-overlay';
+    const lightboxImg = document.createElement('img');
+    lightboxImg.className = 'lightbox-img';
+    overlay.appendChild(lightboxImg);
+    document.body.appendChild(overlay);
+
+    function closeLightbox() {
       overlay.classList.remove('active');
     }
-  });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      overlay.classList.remove('active');
+    for (let i = 0; i < images.length; i++) {
+      images[i].addEventListener('click', function() {
+        lightboxImg.src = this.src;
+        overlay.classList.add('active');
+      });
     }
-  });
-});
 
-// ===========================
-// Page Transition Fade Out
-// ===========================
+    overlay.addEventListener('click', (e) => {
+      if (e.target !== lightboxImg) closeLightbox();
+    });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const links = document.querySelectorAll('a[href$=".html"]');
-  const main = document.querySelector('main');
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+  }
 
-  links.forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      const href = this.getAttribute('href');
+  // ===========================
+  // Page Transition Fade Out
+  // ===========================
 
-      if (main) {
+  function initPageTransitions() {
+    const main = document.querySelector('main');
+    if (!main) return;
+
+    const links = document.querySelectorAll('a[href$=".html"]');
+    for (let i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', function(e) {
+        e.preventDefault();
+        const href = this.getAttribute('href');
         main.classList.add('fade-out');
-        setTimeout(() => {
-          window.location.href = href;
-        }, 300);
-      }
-    });
-  });
-});
+        setTimeout(() => { window.location.href = href; }, 300);
+      });
+    }
+  }
+})();

@@ -1,0 +1,70 @@
+let a = [], rad = [], phase = [], spd = [];
+let prevMouseX, prevMouseY;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  noStroke();
+  colorMode(HSB, 360, 100, 100, 100);
+
+  const num = 500;
+  for (let i = 0; i < num; i++) {
+    a[i] = random(TAU);
+    rad[i] = random(50, 1000);
+    phase[i] = random(TAU);
+    spd[i] = random(0.6, 1.8);
+  }
+
+  prevMouseX = mouseX;
+  prevMouseY = mouseY;
+}
+
+function draw() {
+  background(0);
+  translate(width / 2, height / 2);
+
+  const mx = mouseX - width / 2;
+  const my = mouseY - height / 2;
+
+  const mSpeed = dist(mouseX, mouseY, prevMouseX, prevMouseY);
+  prevMouseX = mouseX;
+  prevMouseY = mouseY;
+
+  const mouseInfluence = constrain(mSpeed * 0.18, 0, 3.2);
+
+  for (let i = 0; i < a.length; i++) {
+    a[i] += i * 0.0001;
+
+    const ox = sin(a[i]) * rad[i];
+    const oy = cos(a[i]) * rad[i];
+
+    let px = ox, py = oy;
+    if (mouseIsPressed) {
+      px = lerp(ox, mx, 0.1);
+      py = lerp(oy, my, 0.1);
+    }
+
+    const pulse = 0.5 + 0.5 * sin(phase[i] + frameCount * 0.03 * spd[i]);
+
+    const dMouse = dist(px, py, mx, my);
+    const near = constrain(
+      map(dMouse, 0, min(width, height) * 0.6, 1.9, 0.75),
+      0.75,
+      1.9
+    );
+
+    const size = (2.0 + pulse * 3.2 + mouseInfluence) * near;
+
+    const jump = floor(frameCount * 0.45) % 360;
+    const hue = (i * 7 + jump + sin(frameCount * 0.08 + i * 0.08) * 120) % 360;
+    const sat = 70 + 30 * sin(frameCount * 0.06 + i * 0.02);
+    const bri = 80 + 20 * sin(frameCount * 0.08 + i * 0.015);
+    const alp = 55 + 45 * pulse;
+
+    fill(hue, constrain(sat, 0, 100), constrain(bri, 0, 100), alp);
+    ellipse(px, py, size, size);
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}

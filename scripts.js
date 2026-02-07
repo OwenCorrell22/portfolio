@@ -148,35 +148,6 @@
       letters.push(span);
     }
 
-    // 2. Create particle canvas
-    const canvas = document.createElement('canvas');
-    canvas.id = 'hero-particles';
-    document.body.appendChild(canvas);
-    const ctx = canvas.getContext('2d');
-
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    // 3. Particles
-    const PARTICLE_COUNT = 60;
-    const CONNECTION_DIST = 130;
-    const MOUSE_RANGE = 220;
-    const particles = [];
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      particles.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        size: Math.random() * 1.5 + 0.8
-      });
-    }
-
     // Pointer state (smooth)
     const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const smoothPointer = { x: pointer.x, y: pointer.y };
@@ -211,50 +182,6 @@
       // Smooth pointer
       smoothPointer.x += (pointer.x - smoothPointer.x) * 0.08;
       smoothPointer.y += (pointer.y - smoothPointer.y) * 0.08;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Update & draw particles
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(42, 42, 42, 0.12)';
-        ctx.fill();
-      }
-
-      // Draw connections near cursor
-      for (let i = 0; i < particles.length; i++) {
-        const pi = particles[i];
-        const dxM = pi.x - smoothPointer.x;
-        const dyM = pi.y - smoothPointer.y;
-        const dMouse = Math.sqrt(dxM * dxM + dyM * dyM);
-
-        if (dMouse < MOUSE_RANGE) {
-          const mouseAlpha = 1 - dMouse / MOUSE_RANGE;
-          for (let j = i + 1; j < particles.length; j++) {
-            const pj = particles[j];
-            const dx = pi.x - pj.x;
-            const dy = pi.y - pj.y;
-            const d = Math.sqrt(dx * dx + dy * dy);
-
-            if (d < CONNECTION_DIST) {
-              const alpha = (1 - d / CONNECTION_DIST) * mouseAlpha * 0.25;
-              ctx.beginPath();
-              ctx.moveTo(pi.x, pi.y);
-              ctx.lineTo(pj.x, pj.y);
-              ctx.strokeStyle = 'rgba(42, 42, 42, ' + alpha + ')';
-              ctx.lineWidth = 0.6;
-              ctx.stroke();
-            }
-          }
-        }
-      }
 
       // Magnetic text + Dynamic light source
       const cx = window.innerWidth / 2;

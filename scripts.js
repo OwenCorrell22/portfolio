@@ -145,17 +145,7 @@
     overlay.className = 'lightbox-overlay';
     const lightboxImg = document.createElement('img');
     lightboxImg.className = 'lightbox-img';
-
-    const prevBtn = document.createElement('button');
-    prevBtn.className = 'lightbox-arrow lightbox-arrow--prev';
-    prevBtn.textContent = '\u2039';
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'lightbox-arrow lightbox-arrow--next';
-    nextBtn.textContent = '\u203A';
-
-    overlay.appendChild(prevBtn);
     overlay.appendChild(lightboxImg);
-    overlay.appendChild(nextBtn);
     document.body.appendChild(overlay);
 
     let currentIndex = 0;
@@ -177,11 +167,8 @@
       });
     }
 
-    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); showImage(currentIndex - 1); });
-    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); showImage(currentIndex + 1); });
-
     overlay.addEventListener('click', (e) => {
-      if (e.target !== lightboxImg && e.target !== prevBtn && e.target !== nextBtn) closeLightbox();
+      if (e.target !== lightboxImg) closeLightbox();
     });
 
     document.addEventListener('keydown', (e) => {

@@ -221,6 +221,15 @@ main {
   letter-spacing: 0.08em;
   margin-bottom: 2rem;
 }
+footersub {
+  display: block;
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 0.75rem;
+  color: var(--c-text-muted);
+  letter-spacing: 0.1em;
+  font-style: italic;
+}
 
 /* ===========================
    Film Page
@@ -691,7 +700,7 @@ footer span {
   }
 
   .photo-gallery {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     padding: 0 1rem;
   }
 

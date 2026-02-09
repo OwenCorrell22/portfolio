@@ -5,6 +5,7 @@
     initPhotoGallery();
     initPageTransitions();
     initHomepageInteraction();
+    initNavName();
   });
 
   // ===========================
@@ -16,33 +17,79 @@
     if (!navIds.length) return;
 
     const hexChars = '0123456789ABCDEF';
-    const intervals = [0, 800, 400, 80];
+    const SCRAMBLE_SPEED = 50;       // ms between random flips during scramble
+    const SCRAMBLE_HOLD = 1000;      // ms of pure scramble before locking starts
+    const LOCK_DELAY = 200;          // ms between each digit locking in
+    const IDLE_SPEED = 90;           // ms for last-digit idle cycle
+    const DIGITS = 6;                // length of hex ID
     const state = [];
 
     for (let i = 0; i < navIds.length; i++) {
+      const base = navIds[i].getAttribute('data-base').split('');
       state.push({
         el: navIds[i],
-        chars: navIds[i].getAttribute('data-base').split(''),
-        lastUpdate: [0, 0, 0, 0]
+        base: base,
+        chars: base.map(() => hexChars[(Math.random() * 16) | 0]),
+        locked: 0,                   // how many digits locked from left
+        done: false
       });
+      // start fully scrambled
+      navIds[i].textContent = state[i].chars.join('');
     }
 
+    const startTime = performance.now();
+    let lastScramble = 0;
+
     function tick(timestamp) {
-      for (let i = 0; i < state.length; i++) {
-        const s = state[i];
-        let changed = false;
-        for (let d = 1; d < 4; d++) {
-          if (timestamp - s.lastUpdate[d] >= intervals[d]) {
+      // scramble unlocked digits
+      if (timestamp - lastScramble >= SCRAMBLE_SPEED) {
+        lastScramble = timestamp;
+        for (let i = 0; i < state.length; i++) {
+          const s = state[i];
+          let changed = false;
+          for (let d = s.locked; d < DIGITS; d++) {
             s.chars[d] = hexChars[(Math.random() * 16) | 0];
-            s.lastUpdate[d] = timestamp;
             changed = true;
           }
+          if (changed) s.el.textContent = s.chars.join('');
         }
-        if (changed) {
+      }
+
+      // lock digits one at a time, staggered per nav item
+      for (let i = 0; i < state.length; i++) {
+        const s = state[i];
+        if (s.done) continue;
+        // each nav item starts locking after a stagger
+        const itemDelay = i * 200;
+        const elapsed = timestamp - startTime - SCRAMBLE_HOLD - itemDelay;
+        if (elapsed < 0) continue;
+        const shouldLock = Math.floor(elapsed / LOCK_DELAY);
+        while (s.locked < DIGITS && s.locked < shouldLock) {
+          s.chars[s.locked] = s.base[s.locked];
+          s.locked++;
+        }
+        if (s.locked >= DIGITS) {
+          s.done = true;
           s.el.textContent = s.chars.join('');
         }
       }
+
+      // once all decoded, switch to idle: only last digit cycles
+      if (state.every(s => s.done)) {
+        idleTick();
+        return;
+      }
+
       requestAnimationFrame(tick);
+    }
+
+    function idleTick() {
+      for (let i = 0; i < state.length; i++) {
+        const s = state[i];
+        s.chars[DIGITS - 1] = hexChars[(Math.random() * 16) | 0];
+        s.el.textContent = s.chars.join('');
+      }
+      setTimeout(() => requestAnimationFrame(idleTick), IDLE_SPEED);
     }
 
     requestAnimationFrame(tick);
@@ -58,11 +105,22 @@
     if (workToggle && subLinks) {
       workToggle.addEventListener('click', () => subLinks.classList.toggle('expanded'));
     }
+
+    // Kick animation on nav clicks
+    const navItems = document.querySelectorAll('.nav-links a, .work-toggle');
+    for (let i = 0; i < navItems.length; i++) {
+      navItems[i].addEventListener('click', function() {
+        this.classList.remove('nav-kick');
+        void this.offsetWidth; // reflow to restart animation
+        this.classList.add('nav-kick');
+      });
+      navItems[i].addEventListener('animationend', function() {
+        this.classList.remove('nav-kick');
+      });
+    }
   }
 
-  // ===========================
   // Photo Gallery (Fade-in + Lightbox)
-  // ===========================
 
   function initPhotoGallery() {
     const images = document.querySelectorAll('.photo-gallery img');
@@ -129,6 +187,32 @@
     }
   }
   // ===========================
+  // Nav Name (hide on home, fade in elsewhere)
+  // ===========================
+
+  function initNavName() {
+    const nameEl = document.querySelector('.name');
+    if (!nameEl) return;
+    const isHome = !!document.querySelector('.hero');
+
+    if (isHome) {
+      nameEl.style.opacity = '0';
+      nameEl.style.pointerEvents = 'none';
+    } else {
+      nameEl.style.opacity = '0';
+      requestAnimationFrame(() => {
+        nameEl.style.transition = 'opacity 0.5s ease';
+        nameEl.style.opacity = '1';
+        nameEl.addEventListener('transitionend', function handler() {
+          nameEl.style.transition = '';
+          nameEl.style.opacity = '';
+          nameEl.removeEventListener('transitionend', handler);
+        });
+      });
+    }
+  }
+
+  // ===========================
   // Homepage Interaction
   // ===========================
 
@@ -167,6 +251,17 @@
       pointer.y = e.touches[0].clientY;
     }, { passive: true });
 
+    // Click/tap burst
+    let burst = null;
+    document.addEventListener('click', (e) => {
+      burst = { x: e.clientX, y: e.clientY, time: performance.now() };
+    });
+    document.addEventListener('touchend', (e) => {
+      if (e.changedTouches.length) {
+        burst = { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY, time: performance.now() };
+      }
+    });
+
     // Gyroscope for mobile
     if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', (e) => {
@@ -199,11 +294,31 @@
 
         // Magnetic push
         let tx = 0, ty = 0;
-        const maxDist = 180;
+        const maxDist = 400;
         if (dist < maxDist && dist > 0) {
-          const force = (1 - dist / maxDist) * 18;
+          const force = (1 - dist / maxDist) * 50;
           tx = (dx / dist) * force;
           ty = (dy / dist) * force;
+        }
+
+        // Click burst
+        if (burst) {
+          const elapsed = performance.now() - burst.time;
+          const duration = 800;
+          if (elapsed < duration) {
+            const progress = elapsed / duration;
+            // ease-out curve: ramps up gently, fades slowly
+            const ease = Math.sin(progress * Math.PI);
+            const strength = ease * 60;
+            const bx = lx - burst.x;
+            const by = ly - burst.y;
+            const bDist = Math.sqrt(bx * bx + by * by) || 1;
+            const falloff = Math.max(0, 1 - bDist / 500);
+            tx += (bx / bDist) * strength * falloff;
+            ty += (by / bDist) * strength * falloff;
+          } else {
+            burst = null;
+          }
         }
 
         // Dynamic shadow (light source at pointer)

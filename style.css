@@ -40,6 +40,16 @@ a { text-decoration: none; color: inherit; }
 
 .nav-links a:active, .work-toggle:active { transform: scale(0.97); }
 
+@keyframes nav-kick {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(6px); }
+  50%  { transform: translateX(-3px); }
+  75%  { transform: translateX(1px); }
+  100% { transform: translateX(0); }
+}
+
+.nav-kick { animation: nav-kick 0.4s ease; }
+
 /* ===========================
    Navigation
    =========================== */

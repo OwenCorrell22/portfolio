@@ -145,8 +145,25 @@
     overlay.className = 'lightbox-overlay';
     const lightboxImg = document.createElement('img');
     lightboxImg.className = 'lightbox-img';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'lightbox-arrow lightbox-arrow--prev';
+    prevBtn.textContent = '\u2039';
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'lightbox-arrow lightbox-arrow--next';
+    nextBtn.textContent = '\u203A';
+
+    overlay.appendChild(prevBtn);
     overlay.appendChild(lightboxImg);
+    overlay.appendChild(nextBtn);
     document.body.appendChild(overlay);
+
+    let currentIndex = 0;
+
+    function showImage(idx) {
+      currentIndex = (idx + images.length) % images.length;
+      lightboxImg.src = images[currentIndex].getAttribute('data-full') || images[currentIndex].src;
+    }
 
     function closeLightbox() {
       overlay.classList.remove('active');
@@ -154,17 +171,24 @@
 
     for (let i = 0; i < images.length; i++) {
       images[i].addEventListener('click', function() {
-        lightboxImg.src = this.src;
+        currentIndex = i;
+        showImage(i);
         overlay.classList.add('active');
       });
     }
 
+    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); showImage(currentIndex - 1); });
+    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); showImage(currentIndex + 1); });
+
     overlay.addEventListener('click', (e) => {
-      if (e.target !== lightboxImg) closeLightbox();
+      if (e.target !== lightboxImg && e.target !== prevBtn && e.target !== nextBtn) closeLightbox();
     });
 
     document.addEventListener('keydown', (e) => {
+      if (!overlay.classList.contains('active')) return;
       if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+      if (e.key === 'ArrowRight') showImage(currentIndex + 1);
     });
   }
 

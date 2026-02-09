@@ -663,6 +663,27 @@ footer span {
 
 .lightbox-overlay.active .lightbox-img { transform: scale(1); }
 
+.lightbox-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 2.2rem;
+  cursor: pointer;
+  padding: 1rem;
+  transition: opacity 0.25s ease;
+  z-index: 1001;
+  user-select: none;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 200;
+}
+
+.lightbox-arrow:hover { opacity: 1; color: #fff; }
+.lightbox-arrow--prev { left: 1.5rem; }
+.lightbox-arrow--next { right: 1.5rem; }
+
 /* ===========================
    Responsive
    =========================== */

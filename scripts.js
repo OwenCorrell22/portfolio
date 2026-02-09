@@ -232,26 +232,25 @@
       letters.push(span);
     }
 
-    // Pointer state (smooth)
+    // Pointer state (smooth) — only activates on real mouse movement after 0.5s
     const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const smoothPointer = { x: pointer.x, y: pointer.y };
+    let active = false;
 
-    document.addEventListener('mousemove', (e) => {
-      pointer.x = e.clientX;
-      pointer.y = e.clientY;
-    });
+    setTimeout(() => {
+      document.addEventListener('mousemove', function onFirstMove(e) {
+        active = true;
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+        document.removeEventListener('mousemove', onFirstMove);
+        document.addEventListener('mousemove', (ev) => {
+          pointer.x = ev.clientX;
+          pointer.y = ev.clientY;
+        });
+      });
+    }, 500);
 
-    document.addEventListener('touchmove', (e) => {
-      pointer.x = e.touches[0].clientX;
-      pointer.y = e.touches[0].clientY;
-    }, { passive: true });
-
-    document.addEventListener('touchstart', (e) => {
-      pointer.x = e.touches[0].clientX;
-      pointer.y = e.touches[0].clientY;
-    }, { passive: true });
-
-    // Click/tap burst
+    // Click/tap burst (works regardless of active)
     let burst = null;
     document.addEventListener('click', (e) => {
       burst = { x: e.clientX, y: e.clientY, time: performance.now() };
@@ -262,52 +261,50 @@
       }
     });
 
-    // Gyroscope for mobile
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', (e) => {
-        if (e.gamma !== null && e.beta !== null) {
-          pointer.x = window.innerWidth / 2 + (e.gamma / 45) * window.innerWidth * 0.4;
-          pointer.y = window.innerHeight / 2 + ((e.beta - 40) / 45) * window.innerHeight * 0.4;
-        }
-      });
-    }
-
     // Animation loop
     function animate() {
-      // Smooth pointer
-      smoothPointer.x += (pointer.x - smoothPointer.x) * 0.08;
-      smoothPointer.y += (pointer.y - smoothPointer.y) * 0.08;
-
-      // Magnetic text + Dynamic light source
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-
       for (let i = 0; i < letters.length; i++) {
         const span = letters[i];
-        const rect = span.getBoundingClientRect();
-        const lx = rect.left + rect.width / 2;
-        const ly = rect.top + rect.height / 2;
-
-        const dx = lx - smoothPointer.x;
-        const dy = ly - smoothPointer.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        // Magnetic push
         let tx = 0, ty = 0;
-        const maxDist = 400;
-        if (dist < maxDist && dist > 0) {
-          const force = (1 - dist / maxDist) * 50;
-          tx = (dx / dist) * force;
-          ty = (dy / dist) * force;
+
+        if (active) {
+          // Smooth pointer
+          smoothPointer.x += (pointer.x - smoothPointer.x) * 0.08;
+          smoothPointer.y += (pointer.y - smoothPointer.y) * 0.08;
+
+          const rect = span.getBoundingClientRect();
+          const lx = rect.left + rect.width / 2;
+          const ly = rect.top + rect.height / 2;
+          const dx = lx - smoothPointer.x;
+          const dy = ly - smoothPointer.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // Magnetic push
+          const maxDist = 400;
+          if (dist < maxDist && dist > 0) {
+            const force = (1 - dist / maxDist) * 50;
+            tx = (dx / dist) * force;
+            ty = (dy / dist) * force;
+          }
+
+          // Dynamic shadow (light source at pointer)
+          const cx = window.innerWidth / 2;
+          const cy = window.innerHeight / 2;
+          const shadowX = (smoothPointer.x - cx) / cx * -6;
+          const shadowY = (smoothPointer.y - cy) / cy * -6;
+          const shadowBlur = 3 + (Math.abs(shadowX) + Math.abs(shadowY)) * 0.6;
+          span.style.textShadow = shadowX + 'px ' + shadowY + 'px ' + shadowBlur + 'px rgba(42,42,42,0.12)';
         }
 
-        // Click burst
+        // Click burst (works even when not active)
         if (burst) {
+          const rect = span.getBoundingClientRect();
+          const lx = rect.left + rect.width / 2;
+          const ly = rect.top + rect.height / 2;
           const elapsed = performance.now() - burst.time;
           const duration = 800;
           if (elapsed < duration) {
             const progress = elapsed / duration;
-            // ease-out curve: ramps up gently, fades slowly
             const ease = Math.sin(progress * Math.PI);
             const strength = ease * 60;
             const bx = lx - burst.x;
@@ -321,13 +318,7 @@
           }
         }
 
-        // Dynamic shadow (light source at pointer)
-        const shadowX = (smoothPointer.x - cx) / cx * -6;
-        const shadowY = (smoothPointer.y - cy) / cy * -6;
-        const shadowBlur = 3 + (Math.abs(shadowX) + Math.abs(shadowY)) * 0.6;
-
         span.style.transform = 'translate(' + tx + 'px,' + ty + 'px)';
-        span.style.textShadow = shadowX + 'px ' + shadowY + 'px ' + shadowBlur + 'px rgba(42,42,42,0.12)';
       }
 
       requestAnimationFrame(animate);

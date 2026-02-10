@@ -6,6 +6,7 @@
     initPageTransitions();
     initHomepageInteraction();
     initNavName();
+    initCustomCursor();
   });
 
   // ===========================
@@ -337,4 +338,31 @@
 
     animate();
   }
+  function initCustomCursor() {
+    if ('ontouchstart' in window) return;
+
+    const cursor = document.createElement('div');
+    cursor.className = 'custom-cursor';
+    document.body.appendChild(cursor);
+
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      if (el && (el.tagName === 'A' || el.tagName === 'BUTTON' || el.closest('a') || el.closest('button'))) {
+        cursor.classList.add('hovering');
+      } else {
+        cursor.classList.remove('hovering');
+      }
+    });
+
+    document.addEventListener('mouseleave', () => {
+      cursor.style.opacity = '0';
+    });
+    document.addEventListener('mouseenter', () => {
+      cursor.style.opacity = '1';
+    });
+  }
+
 })();

@@ -1,0 +1,62 @@
+let click = 0;
+let waveEnergy = 0;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  noFill();
+  strokeWeight(2);
+}
+
+function draw() {
+  let interactY = (mouseY - height / 2) * 0.0003;
+  let interactX = (mouseX - width / 2) * 0.0002;
+  let centerN = noise(interactX, interactY, frameCount * 0.002);
+  waveEnergy = lerp(waveEnergy, centerN, 0.05);
+
+  let bgR = map(waveEnergy, 0, 1, 180, 215);
+  let bgG = map(waveEnergy, 0, 1, 200, 185);
+  let bgB = map(waveEnergy, 0, 1, 205, 180);
+  background(bgR, bgG, bgB);
+
+  translate(width / 2, height / 2);
+  click *= 0.9;
+  rot = sin(frameCount * 0.0002) * 0.01;
+  push();
+  rotate(rot);
+  drawWaves(interactX, interactY);
+  pop();
+
+  push();
+  rotate(rot);
+  scale(1, -1);
+  drawWaves(interactX, interactY);
+  pop();
+}
+
+function drawWaves(interactX, interactY) {
+  let rows = 10;
+  for (let j = 0; j < rows; j++) {
+    beginShape();
+    let yOff = j * 10;
+    stroke(150 - j * 2, 150 - j, 200 - j, 80);
+    for (let x = -width; x < width; x += 10) {
+      let n = noise(x * 0.002 + interactX, j * 0.1 + interactY, frameCount * 0.002);
+      let y = map(n, 0, 1, -height, height);
+      let w = y - yOff + sin(frameCount * 0.01 + j) * 10;
+      let pulseY = w * (1 + click * 10);
+      let pulseX = x * (1 + click * 10);
+      vertex(pulseX, pulseY);
+    }
+    endShape();
+  }
+}
+
+function mousePressed() {
+  if (event.target.tagName !== 'A' && event.target.tagName !== 'BUTTON') {
+    click = 1;
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}

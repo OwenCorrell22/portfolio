@@ -108,7 +108,7 @@ nav {
 .work-toggle {
   all: unset;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
   letter-spacing: 0.02em;
   display: inline-block;
   width: fit-content;
@@ -126,7 +126,7 @@ nav {
 .nav-links a {
   display: inline-block;
   width: fit-content;
-  font-size: 0.9rem;
+  font-size: 1rem;
   letter-spacing: 0.02em;
 }
 
@@ -152,7 +152,7 @@ nav {
 }
 
 .sub-links a {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: var(--c-text-light);
   transform: translateY(-5px);
   transition: transform var(--t-fast), opacity var(--t-fast);

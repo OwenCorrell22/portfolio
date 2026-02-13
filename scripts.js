@@ -5,24 +5,21 @@
     initPhotoGallery();
     initPageTransitions();
     initHomepageInteraction();
+    initHeroGlitch();
     initNavName();
     initCustomCursor();
   });
-
-  // ===========================
-  // Hex ID Animation (rAF-batched)
-  // ===========================
 
   function initHexAnimation() {
     const navIds = document.querySelectorAll('.nav-id');
     if (!navIds.length) return;
 
     const hexChars = '0123456789ABCDEF';
-    const SCRAMBLE_SPEED = 50;       // ms between random flips during scramble
-    const SCRAMBLE_HOLD = 1000;      // ms of pure scramble before locking starts
-    const LOCK_DELAY = 200;          // ms between each digit locking in
-    const IDLE_SPEED = 90;           // ms for last-digit idle cycle
-    const DIGITS = 6;                // length of hex ID
+    const SCRAMBLE_SPEED = 50;
+    const SCRAMBLE_HOLD = 1000;
+    const LOCK_DELAY = 200;
+    const IDLE_SPEED = 90;
+    const DIGITS = 6;
     const state = [];
 
     for (let i = 0; i < navIds.length; i++) {
@@ -31,10 +28,9 @@
         el: navIds[i],
         base: base,
         chars: base.map(() => hexChars[(Math.random() * 16) | 0]),
-        locked: 0,                   // how many digits locked from left
+        locked: 0,
         done: false
       });
-      // start fully scrambled
       navIds[i].textContent = state[i].chars.join('');
     }
 
@@ -42,7 +38,6 @@
     let lastScramble = 0;
 
     function tick(timestamp) {
-      // scramble unlocked digits
       if (timestamp - lastScramble >= SCRAMBLE_SPEED) {
         lastScramble = timestamp;
         for (let i = 0; i < state.length; i++) {
@@ -56,11 +51,9 @@
         }
       }
 
-      // lock digits one at a time, staggered per nav item
       for (let i = 0; i < state.length; i++) {
         const s = state[i];
         if (s.done) continue;
-        // each nav item starts locking after a stagger
         const itemDelay = i * 200;
         const elapsed = timestamp - startTime - SCRAMBLE_HOLD - itemDelay;
         if (elapsed < 0) continue;
@@ -75,7 +68,6 @@
         }
       }
 
-      // once all decoded, switch to idle: only last digit cycles
       if (state.every(s => s.done)) {
         idleTick();
         return;
@@ -96,10 +88,6 @@
     requestAnimationFrame(tick);
   }
 
-  // ===========================
-  // Work Submenu Toggle
-  // ===========================
-
   function initWorkToggle() {
     const workToggle = document.querySelector('.work-toggle');
     const subLinks = document.querySelector('.sub-links');
@@ -107,12 +95,11 @@
       workToggle.addEventListener('click', () => subLinks.classList.toggle('expanded'));
     }
 
-    // Kick animation on nav clicks
     const navItems = document.querySelectorAll('.nav-links a, .work-toggle');
     for (let i = 0; i < navItems.length; i++) {
       navItems[i].addEventListener('click', function() {
         this.classList.remove('nav-kick');
-        void this.offsetWidth; // reflow to restart animation
+        void this.offsetWidth;
         this.classList.add('nav-kick');
       });
       navItems[i].addEventListener('animationend', function() {
@@ -121,13 +108,10 @@
     }
   }
 
-  // Photo Gallery (Fade-in + Lightbox)
-
   function initPhotoGallery() {
     const images = document.querySelectorAll('.photo-gallery img');
     if (!images.length) return;
 
-    // Fade-in on scroll
     const observer = new IntersectionObserver((entries) => {
       for (let i = 0; i < entries.length; i++) {
         if (entries[i].isIntersecting) {
@@ -141,7 +125,6 @@
       observer.observe(images[i]);
     }
 
-    // Lightbox
     const overlay = document.createElement('div');
     overlay.className = 'lightbox-overlay';
     const lightboxImg = document.createElement('img');
@@ -180,10 +163,6 @@
     });
   }
 
-  // ===========================
-  // Page Transition Fade Out
-  // ===========================
-
   function initPageTransitions() {
     const main = document.querySelector('main');
     if (!main) return;
@@ -198,9 +177,6 @@
       });
     }
   }
-  // ===========================
-  // Nav Name (hide on home, fade in elsewhere)
-  // ===========================
 
   function initNavName() {
     const nameEl = document.querySelector('.name');
@@ -224,15 +200,10 @@
     }
   }
 
-  // ===========================
-  // Homepage Interaction
-  // ===========================
-
   function initHomepageInteraction() {
     const heroTitle = document.querySelector('.hero h1');
     if (!heroTitle) return;
 
-    // 1. Split text into individual letter spans
     const text = heroTitle.textContent;
     heroTitle.innerHTML = '';
     const letters = [];
@@ -244,7 +215,6 @@
       letters.push(span);
     }
 
-    // Pointer state (smooth) — only activates on real mouse movement after 0.5s
     const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const smoothPointer = { x: pointer.x, y: pointer.y };
     let active = false;
@@ -262,7 +232,6 @@
       });
     }, 500);
 
-    // Click/tap burst (works regardless of active)
     let burst = null;
     document.addEventListener('click', (e) => {
       burst = { x: e.clientX, y: e.clientY, time: performance.now() };
@@ -273,14 +242,12 @@
       }
     });
 
-    // Animation loop
     function animate() {
       for (let i = 0; i < letters.length; i++) {
         const span = letters[i];
         let tx = 0, ty = 0;
 
         if (active) {
-          // Smooth pointer
           smoothPointer.x += (pointer.x - smoothPointer.x) * 0.08;
           smoothPointer.y += (pointer.y - smoothPointer.y) * 0.08;
 
@@ -291,7 +258,6 @@
           const dy = ly - smoothPointer.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          // Magnetic push
           const maxDist = 400;
           if (dist < maxDist && dist > 0) {
             const force = (1 - dist / maxDist) * 50;
@@ -299,7 +265,6 @@
             ty = (dy / dist) * force;
           }
 
-          // Dynamic shadow (light source at pointer)
           const cx = window.innerWidth / 2;
           const cy = window.innerHeight / 2;
           const shadowX = (smoothPointer.x - cx) / cx * -6;
@@ -308,7 +273,6 @@
           span.style.textShadow = shadowX + 'px ' + shadowY + 'px ' + shadowBlur + 'px rgba(42,42,42,0.12)';
         }
 
-        // Click burst (works even when not active)
         if (burst) {
           const rect = span.getBoundingClientRect();
           const lx = rect.left + rect.width / 2;
@@ -338,6 +302,61 @@
 
     animate();
   }
+
+  function initHeroGlitch() {
+    const heroTitle = document.querySelector('.hero h1');
+    if (!heroTitle) return;
+
+    const letters = heroTitle.querySelectorAll('.hero-letter');
+    if (!letters.length) return;
+
+    const originalText = [];
+    for (var i = 0; i < letters.length; i++) {
+      originalText.push(letters[i].textContent);
+    }
+
+    var glitchSet1 = '!@#$%&*░▒▓█▄▀◤◢/\\|<>_-+=~^';
+    var glitchSet2 = '₀₁₂₃₄₅₆₇₈₉⌐¬½¼¡«»▐▀▄■□';
+
+    function restore() {
+      for (var k = 0; k < letters.length; k++) {
+        letters[k].textContent = originalText[k];
+        letters[k].style.opacity = '1';
+        letters[k].style.transform = '';
+      }
+    }
+
+    function runBurst(chars, intensity, jitter, speed, flickers, callback) {
+      var count = 0;
+      var interval = setInterval(function() {
+        for (var j = 0; j < letters.length; j++) {
+          if (originalText[j] === '\u00A0') continue;
+          if (Math.random() < intensity) {
+            letters[j].textContent = chars[(Math.random() * chars.length) | 0];
+            letters[j].style.opacity = (Math.random() * 0.5 + 0.5).toString();
+            letters[j].style.transform = 'translate(' + (Math.random() * jitter - jitter / 2) + 'px,' + (Math.random() * jitter - jitter / 2) + 'px)';
+          } else {
+            letters[j].textContent = originalText[j];
+            letters[j].style.opacity = '1';
+            letters[j].style.transform = '';
+          }
+        }
+        count++;
+        if (count >= flickers) {
+          clearInterval(interval);
+          restore();
+          if (callback) callback();
+        }
+      }, speed);
+    }
+
+    runBurst(glitchSet1, 0.45, 4, 60, 5, function() {
+      setTimeout(function() {
+        runBurst(glitchSet2, 0.3, 2, 90, 4, null);
+      }, 900);
+    });
+  }
+
   function initCustomCursor() {
     if ('ontouchstart' in window) return;
 

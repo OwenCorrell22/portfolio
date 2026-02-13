@@ -47,10 +47,6 @@ body {
   min-height: 100vh;
 }
 
-/* ===========================
-   Shared Patterns
-   =========================== */
-
 a { text-decoration: none; color: inherit; }
 
 .name, .nav-links a, .work-toggle, .contact-list a, .archive-sidebar a {
@@ -70,10 +66,6 @@ a { text-decoration: none; color: inherit; }
 }
 
 .nav-kick { animation: nav-kick 0.4s ease; }
-
-/* ===========================
-   Navigation
-   =========================== */
 
 nav {
   position: fixed;
@@ -130,10 +122,6 @@ nav {
   letter-spacing: 0.02em;
 }
 
-/* ===========================
-   Work Submenu
-   =========================== */
-
 .sub-links {
   display: flex;
   flex-direction: column;
@@ -160,10 +148,6 @@ nav {
 
 .sub-links.expanded a { transform: translateY(0); }
 
-/* ===========================
-   Main Content
-   =========================== */
-
 main {
   position: absolute;
   inset: 0;
@@ -175,10 +159,6 @@ main {
   opacity: 0;
   animation: fadeIn 0.6s ease forwards;
 }
-
-/* ===========================
-   Hero (Homepage)
-   =========================== */
 
 .hero {
   display: flex;
@@ -222,10 +202,6 @@ main {
   letter-spacing: 0.02em;
 }
 
-/* ===========================
-   Photo Page
-   =========================== */
-
 .photo-page {
   position: relative;
   flex-direction: column;
@@ -242,6 +218,7 @@ main {
   letter-spacing: 0.08em;
   margin-bottom: 2rem;
 }
+
 footersub {
   display: block;
   text-align: center;
@@ -251,10 +228,6 @@ footersub {
   letter-spacing: 0.1em;
   font-style: italic;
 }
-
-/* ===========================
-   Film Page
-   =========================== */
 
 .film-page {
   position: relative;
@@ -352,10 +325,6 @@ footersub {
 .film-footer a:hover {
   opacity: 0.5;
 }
-
-/* ===========================
-   Tech Page
-   =========================== */
 
 .tech-page {
   position: relative;
@@ -495,10 +464,6 @@ footersub {
   font-style: italic;
 }
 
-/* ===========================
-   Resume Page
-   =========================== */
-
 .resume-page {
   position: relative;
   flex-direction: column;
@@ -542,10 +507,6 @@ footersub {
   border: 1px solid rgba(42, 42, 42, 0.08);
 }
 
-/* ===========================
-   Archive Sidebar
-   =========================== */
-
 .archive-sidebar {
   position: fixed;
   right: 2.5rem;
@@ -585,10 +546,6 @@ footersub {
   max-width: 10rem;
 }
 
-/* ===========================
-   Photo Gallery
-   =========================== */
-
 .photo-gallery {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -610,10 +567,6 @@ footersub {
 
 .photo-gallery img:hover { filter: brightness(0.85); }
 .photo-gallery img.visible { opacity: 1; }
-
-/* ===========================
-   About Page
-   =========================== */
 
 .about-content {
   display: flex;
@@ -651,10 +604,6 @@ footersub {
   line-height: 1.7;
 }
 
-/* ===========================
-   Contact Page
-   =========================== */
-
 .contact-list {
   display: flex;
   flex-direction: column;
@@ -674,10 +623,6 @@ footersub {
   opacity: 0.5;
 }
 
-/* ===========================
-   Footer
-   =========================== */
-
 footer {
   position: fixed;
   inset: auto 0 0;
@@ -693,10 +638,6 @@ footer span {
   letter-spacing: 0.03em;
 }
 
-/* ===========================
-   Animations
-   =========================== */
-
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -704,10 +645,6 @@ footer span {
 
 .fade-out { animation: fadeOut 0.3s ease-out forwards; }
 @keyframes fadeOut { to { opacity: 0; } }
-
-/* ===========================
-   Lightbox
-   =========================== */
 
 .lightbox-overlay {
   position: fixed;
@@ -739,12 +676,6 @@ footer span {
 }
 
 .lightbox-overlay.active .lightbox-img { transform: scale(1); }
-
-
-
-/* ===========================
-   Responsive
-   =========================== */
 
 @media (max-width: 768px) {
   nav {

@@ -107,21 +107,30 @@
     const imgs = document.querySelectorAll('.photo-gallery img');
     if (!imgs.length) return;
 
-    const nFirst = 6;
-    const loadZone = 1400;
-    const unloadZone = 800;
-    const loadRoot = loadZone + 'px';
-    const unloadRoot = unloadZone + 'px 0px ' + unloadZone + 'px 0px';
+    const nFirst = 9;
+    const loadZone = 400;
+
+    function thumbOf(el) {
+      return el.getAttribute('data-thumb') || el.getAttribute('data-src') || el.currentSrc || el.src;
+    }
+
+    function fullOf(el) {
+      return el.getAttribute('data-full') || thumbOf(el);
+    }
 
     for (let i = 0; i < imgs.length; i++) {
-      imgs[i].setAttribute('data-full', imgs[i].src);
+      const thumb = imgs[i].getAttribute('data-thumb') || imgs[i].getAttribute('src');
+      imgs[i].setAttribute('data-thumb', thumb);
+      imgs[i].setAttribute('decoding', 'async');
       if (i >= nFirst) {
-        imgs[i].setAttribute('data-src', imgs[i].src);
+        imgs[i].setAttribute('data-src', thumb);
         imgs[i].src = PLACEHOLDER;
+        imgs[i].setAttribute('loading', 'lazy');
       } else {
+        imgs[i].src = thumb;
         imgs[i].setAttribute('loading', 'eager');
-        if (i < 2) imgs[i].setAttribute('fetchpriority', 'high');
-        else if (i >= 3) imgs[i].setAttribute('fetchpriority', 'low');
+        if (i < 3) imgs[i].setAttribute('fetchpriority', 'high');
+        imgs[i].classList.add('visible');
       }
     }
 
@@ -130,48 +139,37 @@
       return r.bottom > -loadZone && r.top < window.innerHeight + loadZone;
     }
 
-    function loadInZone(el) {
-      var src = el.getAttribute('data-src');
-      if (!src) return;
-      if (!inZone(el)) return;
+    function loadThumb(el) {
+      var src = el.getAttribute('data-src') || el.getAttribute('data-thumb');
+      if (!src || src.indexOf('data:') === 0) return;
+      if (el.src && el.src.indexOf('data:') !== 0 && !el.getAttribute('data-src')) return;
       el.src = src;
       el.removeAttribute('data-src');
       el.classList.add('visible');
     }
 
-    function offScreen(el, buf) {
-      var r = el.getBoundingClientRect();
-      return r.bottom < -buf || r.top > window.innerHeight + buf;
-    }
-
     function catchUp() {
       for (let i = 0; i < imgs.length; i++) {
-        loadInZone(imgs[i]);
+        if (inZone(imgs[i])) loadThumb(imgs[i]);
       }
     }
 
     const loadObs = new IntersectionObserver((entries) => {
       for (let i = 0; i < entries.length; i++) {
-        const el = entries[i].target;
-        if (entries[i].isIntersecting) {
-          loadInZone(el);
-          el.classList.add('visible');
-        }
+        if (entries[i].isIntersecting) loadThumb(entries[i].target);
       }
-    }, { threshold: 0, rootMargin: loadRoot });
+    }, { threshold: 0, rootMargin: loadZone + 'px 0px' });
 
     const unloadObs = new IntersectionObserver((entries) => {
       for (let i = 0; i < entries.length; i++) {
         const el = entries[i].target;
-        var loaded = el.src && el.src.indexOf('data:') !== 0;
-        var far = offScreen(el, unloadZone);
-        if (!entries[i].isIntersecting && loaded && far) {
-          el.setAttribute('data-src', el.src);
-          el.src = PLACEHOLDER;
-          el.classList.remove('visible');
-        }
+        if (entries[i].isIntersecting) continue;
+        if (!el.src || el.src.indexOf('data:') === 0) continue;
+        el.setAttribute('data-src', thumbOf(el));
+        el.src = PLACEHOLDER;
+        el.classList.remove('visible');
       }
-    }, { threshold: 0, rootMargin: unloadRoot });
+    }, { threshold: 0, rootMargin: '1200px 0px' });
 
     for (let i = 0; i < imgs.length; i++) {
       loadObs.observe(imgs[i]);
@@ -179,16 +177,7 @@
     }
 
     catchUp();
-    setTimeout(catchUp, 100);
-    setTimeout(catchUp, 500);
-    var t = null;
-    window.addEventListener('scroll', function() {
-      if (t) clearTimeout(t);
-      t = setTimeout(function() {
-        t = null;
-        catchUp();
-      }, 80);
-    }, { passive: true });
+    window.addEventListener('scroll', catchUp, { passive: true });
 
     const lb = document.createElement('div');
     lb.className = 'lightbox-overlay';
@@ -198,14 +187,37 @@
     document.body.appendChild(lb);
 
     let idx = 0;
+    let loadToken = 0;
+
+    function preload(url) {
+      if (!url) return;
+      const im = new Image();
+      im.decoding = 'async';
+      im.src = url;
+    }
 
     function show(idxN) {
       idx = (idxN + imgs.length) % imgs.length;
-      lbImg.src = imgs[idx].getAttribute('data-full') || imgs[idx].src;
+      const token = ++loadToken;
+      const thumb = thumbOf(imgs[idx]);
+      const full = fullOf(imgs[idx]);
+      lbImg.src = thumb;
+      if (full && full !== thumb) {
+        const hi = new Image();
+        hi.decoding = 'async';
+        hi.onload = function() {
+          if (token !== loadToken) return;
+          lbImg.src = full;
+        };
+        hi.src = full;
+      }
+      preload(fullOf(imgs[(idx + 1) % imgs.length]));
+      preload(fullOf(imgs[(idx - 1 + imgs.length) % imgs.length]));
     }
 
     function closeLb() {
       lb.classList.remove('active');
+      loadToken++;
     }
 
     for (let i = 0; i < imgs.length; i++) {

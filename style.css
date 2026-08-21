@@ -548,6 +548,8 @@ canvas.resume-canvas {
   object-fit: cover;
   cursor: pointer;
   opacity: 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 14rem;
   transition: opacity 0.6s ease, filter var(--t-fast);
 }
 

@@ -39,12 +39,17 @@
   border-width: 1px;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  color-scheme: only light;
+  background-color: #fff;
+  color: #000;
+}
 
 body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background: var(--c-bg);
-  color: var(--c-text);
+  background-color: #fff;
+  color: #000;
   font-size: 1rem;
   display: flex;
   flex-direction: column;
@@ -95,6 +100,7 @@ nav {
   letter-spacing: 0.02em;
   display: inline-block;
   width: fit-content;
+  color: #000;
 }
 
 .nav-id {
@@ -147,6 +153,13 @@ main {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  background-color: #fff;
+  color: #000;
+}
+
+nav, footer {
+  background-color: #fff;
+  color: #000;
 }
 
 main.home-simple {

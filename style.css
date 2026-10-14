@@ -1,13 +1,13 @@
 :root {
-  --c-text: #f2f2f0;
-  --c-text-mid: #d4d4d0;
-  --c-text-light: #b8b8b4;
-  --c-text-muted: #8e8e8a;
-  --c-bg: #161618;
-  --c-bg-subtle: #1e1e22;
-  --c-line: rgba(255, 255, 255, 0.1);
-  --c-line-strong: rgba(255, 255, 255, 0.16);
-  --c-shadow: rgba(0, 0, 0, 0.35);
+  --c-text: #000;
+  --c-text-mid: #000;
+  --c-text-light: #000;
+  --c-text-muted: #000;
+  --c-bg: #fff;
+  --c-bg-subtle: #fff;
+  --c-line: rgba(0, 0, 0, 0.15);
+  --c-line-strong: rgba(0, 0, 0, 0.4);
+  --c-shadow: rgba(0, 0, 0, 0.08);
   --t-fast: 0.3s ease;
   --t-med: 0.35s ease;
 }
@@ -25,7 +25,7 @@
   left: 0;
   width: 28px;
   height: 28px;
-  border: 1.5px solid #fff;
+  border: 1.5px solid #000;
   border-radius: 50%;
   pointer-events: none;
   z-index: 99999;
@@ -53,23 +53,11 @@ body {
 
 a { text-decoration: none; color: inherit; }
 
-.name, .nav-links a, .work-toggle, .contact-list a, .archive-sidebar a {
+.contact-list a, .archive-sidebar a {
   transition: opacity var(--t-fast), transform var(--t-fast);
 }
 
 .name:hover, .nav-links a:hover, .work-toggle:hover, .sub-links a:hover { opacity: 0.5; }
-
-.nav-links a:active, .work-toggle:active { transform: scale(0.97); }
-
-@keyframes nav-kick {
-  0%   { transform: translateX(0); }
-  20%  { transform: translateX(6px); }
-  50%  { transform: translateX(-3px); }
-  75%  { transform: translateX(1px); }
-  100% { transform: translateX(0); }
-}
-
-.nav-kick { animation: nav-kick 0.4s ease; }
 
 nav {
   position: fixed;
@@ -159,8 +147,6 @@ main {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  opacity: 0;
-  animation: fadeIn 0.6s ease forwards;
 }
 
 main.home-simple {
@@ -207,7 +193,7 @@ main.home-simple {
   bottom: 3rem;
   z-index: 99;
   max-width: 12rem;
-  color: #fff;
+  color: #000;
   pointer-events: none;
 }
 
@@ -263,7 +249,7 @@ main.home-simple {
 }
 
 .film-youtube-btn:hover {
-  border-color: rgba(255, 255, 255, 0.28);
+  border-color: rgba(0, 0, 0, 0.55);
   box-shadow: 0 4px 16px var(--c-shadow);
   opacity: 0.85;
 }
@@ -397,7 +383,7 @@ main.home-simple {
 }
 
 .tech-library-item:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .tech-library-tag {
@@ -451,7 +437,7 @@ main.home-simple {
 }
 
 .resume-download:hover {
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: rgba(0, 0, 0, 0.55);
   box-shadow: 0 4px 16px var(--c-shadow);
   opacity: 0.7;
 }
@@ -626,13 +612,6 @@ footer span {
   letter-spacing: 0.03em;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-out { animation: fadeOut 0.3s ease-out forwards; }
-@keyframes fadeOut { to { opacity: 0; } }
 
 .lightbox-overlay {
   position: fixed;

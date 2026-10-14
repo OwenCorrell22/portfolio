@@ -3,7 +3,6 @@
     initHexAnimation();
     initWorkToggle();
     initPhotoGallery();
-    initPageTransitions();
     initCustomCursor();
   });
 
@@ -86,18 +85,6 @@
     const sub = document.querySelector('.sub-links');
     if (WORK_DROPDOWN && btn && sub) {
       btn.addEventListener('click', () => sub.classList.toggle('expanded'));
-    }
-
-    const items = document.querySelectorAll('.nav-links a, .work-toggle');
-    for (let i = 0; i < items.length; i++) {
-      items[i].addEventListener('click', function() {
-        this.classList.remove('nav-kick');
-        void this.offsetWidth;
-        this.classList.add('nav-kick');
-      });
-      items[i].addEventListener('animationend', function() {
-        this.classList.remove('nav-kick');
-      });
     }
   }
 
@@ -244,41 +231,61 @@
     });
   }
 
-  function initPageTransitions() {
-    const main = document.querySelector('main');
-    if (!main) return;
-
-    const links = document.querySelectorAll('a[href$=".html"]');
-    for (let i = 0; i < links.length; i++) {
-      links[i].addEventListener('click', function(e) {
-        if (this.getAttribute('target') === '_blank') return;
-        e.preventDefault();
-        const href = this.getAttribute('href');
-        if (!href) return;
-        main.classList.add('fade-out');
-        setTimeout(() => { window.location.href = href; }, 300);
-      });
-    }
-  }
-
   function initCustomCursor() {
     if ('ontouchstart' in window) return;
 
+    const STORAGE_KEY = 'portfolio-cursor-pos';
     const cur = document.createElement('div');
     cur.className = 'custom-cursor';
     document.body.appendChild(cur);
 
-    document.addEventListener('mousemove', (e) => {
-      cur.style.left = e.clientX + 'px';
-      cur.style.top = e.clientY + 'px';
+    function place(x, y) {
+      cur.style.left = x + 'px';
+      cur.style.top = y + 'px';
+    }
 
-      const el = document.elementFromPoint(e.clientX, e.clientY);
+    function savePos(x, y) {
+      try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ x: x, y: y }));
+      } catch (_) {}
+    }
+
+    function updateHover(x, y) {
+      const el = document.elementFromPoint(x, y);
       if (el && (el.tagName === 'A' || el.tagName === 'BUTTON' || el.closest('a') || el.closest('button'))) {
         cur.classList.add('hovering');
       } else {
         cur.classList.remove('hovering');
       }
-    });
+    }
+
+    let restored = false;
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const pos = JSON.parse(raw);
+        if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
+          place(pos.x, pos.y);
+          updateHover(pos.x, pos.y);
+          restored = true;
+        }
+      }
+    } catch (_) {}
+
+    if (!restored) {
+      cur.style.opacity = '0';
+    }
+
+    function onPointer(x, y) {
+      place(x, y);
+      savePos(x, y);
+      updateHover(x, y);
+      cur.style.opacity = '1';
+    }
+
+    document.addEventListener('mousemove', (e) => onPointer(e.clientX, e.clientY));
+
+    document.addEventListener('mousedown', (e) => savePos(e.clientX, e.clientY));
 
     document.addEventListener('mouseleave', () => {
       cur.style.opacity = '0';

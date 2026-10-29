@@ -17,10 +17,14 @@
 
     for (let i = 0; i < ids.length; i++) {
       const raw = ids[i].getAttribute('data-base');
-      const base = (raw && raw.length >= 6) ? raw.slice(0, 6).split('') : ['0','0','0','0','0','0'];
+      const width = (raw && raw.length >= 6) ? 6 : (raw && raw.length >= 3) ? 3 : 6;
+      const base = (raw && raw.length >= width)
+        ? raw.slice(0, width).split('')
+        : Array(width).fill('0');
       state.push({
         el: ids[i],
         base: base,
+        width: width,
         chars: base.map(() => hex[(Math.random() * 16) | 0]),
         locked: 0,
         done: false
@@ -36,10 +40,10 @@
         last = ts;
         for (let i = 0; i < state.length; i++) {
           const s = state[i];
-          for (let d = s.locked; d < 6; d++) {
+          for (let d = s.locked; d < s.width; d++) {
             s.chars[d] = hex[(Math.random() * 16) | 0];
           }
-          if (s.locked < 6) s.el.textContent = s.chars.join('');
+          if (s.locked < s.width) s.el.textContent = s.chars.join('');
         }
       }
 
@@ -50,11 +54,11 @@
         const elapsed = ts - start - 1000 - itemDelay;
         if (elapsed < 0) continue;
         const n = Math.floor(elapsed / delay);
-        while (s.locked < 6 && s.locked < n) {
+        while (s.locked < s.width && s.locked < n) {
           s.chars[s.locked] = s.base[s.locked];
           s.locked++;
         }
-        if (s.locked >= 6) {
+        if (s.locked >= s.width) {
           s.done = true;
           s.el.textContent = s.chars.join('');
         }
@@ -70,7 +74,7 @@
     function idle() {
       for (let i = 0; i < state.length; i++) {
         const s = state[i];
-        s.chars[5] = hex[(Math.random() * 16) | 0];
+        s.chars[s.width - 1] = hex[(Math.random() * 16) | 0];
         s.el.textContent = s.chars.join('');
       }
       setTimeout(() => requestAnimationFrame(idle), 90);
@@ -80,10 +84,13 @@
   }
 
   function initWorkToggle() {
-    const WORK_DROPDOWN = false; // set true to restore Projects / Photo / Video dropdown
     const btn = document.querySelector('.work-toggle');
     const sub = document.querySelector('.sub-links');
-    if (WORK_DROPDOWN && btn && sub) {
+    const workPages = /(?:photography|code|film|visual-design|resume)\.html$/;
+    if (sub && workPages.test(location.pathname)) {
+      sub.classList.add('expanded');
+    }
+    if (btn && sub) {
       btn.addEventListener('click', () => sub.classList.toggle('expanded'));
     }
   }

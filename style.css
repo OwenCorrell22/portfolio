@@ -112,6 +112,11 @@ nav {
   vertical-align: baseline;
 }
 
+.nav-id--sub {
+  font-size: 0.65rem;
+  min-width: 1.6em;
+}
+
 .nav-links a {
   display: inline-block;
   width: fit-content;
@@ -120,30 +125,23 @@ nav {
 }
 
 .sub-links {
-  display: none; /* hide work dropdown for now; keep markup for later */
+  display: none;
   flex-direction: column;
   gap: 1.2rem;
   padding-left: 1.5rem;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.4s ease, opacity var(--t-fast), padding-top 0.4s ease;
+  padding-top: 1.2rem;
 }
 
 .sub-links.expanded {
-  max-height: 260px;
-  opacity: 1;
-  padding-top: 1.2rem;
+  display: flex;
 }
 
 .sub-links a {
   font-size: 0.9rem;
   color: var(--c-text-light);
-  transform: translateY(-5px);
-  transition: transform var(--t-fast), opacity var(--t-fast);
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
 }
-
-.sub-links.expanded a { transform: translateY(0); }
 
 main {
   position: absolute;
@@ -657,6 +655,83 @@ footer span {
 
 .lightbox-overlay.active .lightbox-img { transform: scale(1); }
 
+.vd-page {
+  position: relative;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-top: 5rem;
+  padding-left: 13.5rem;
+  padding-right: 2rem;
+  padding-bottom: 5rem;
+  min-height: auto;
+  gap: 3rem;
+  max-width: 52rem;
+}
+
+.vd-section {
+  width: 100%;
+  text-align: left;
+}
+
+.vd-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+.vd-note {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+.vd-gifs {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.vd-gifs img {
+  display: block;
+  width: 100%;
+  max-width: 26rem;
+}
+
+.vd-link {
+  font-size: 0.85rem;
+  color: #000;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.vd-link:hover {
+  opacity: 0.5;
+}
+
+.vd-youtube {
+  display: block;
+  width: 100%;
+  max-width: 26rem;
+}
+
+.vd-youtube img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.vd-spotify {
+  display: block;
+  width: 100%;
+  max-width: 26rem;
+  height: 152px;
+  border: 0;
+  margin-bottom: 0.75rem;
+}
+
 @media (max-width: 768px) {
   nav {
     position: relative;
@@ -735,6 +810,12 @@ footer span {
 
   .resume-container {
     padding: 0 1rem;
+  }
+
+  .vd-page {
+    padding-top: 2rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
   .archive-sidebar {

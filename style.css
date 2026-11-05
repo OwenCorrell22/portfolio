@@ -195,10 +195,14 @@ main.home-simple {
   position: fixed;
   left: 2.5rem;
   bottom: 3rem;
-  z-index: 99;
-  max-width: 12rem;
+  z-index: 200;
+  max-width: 16rem;
   color: #000;
   pointer-events: none;
+}
+
+.photo-tags-line {
+  display: block;
 }
 
 .footersub {

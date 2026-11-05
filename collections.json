@@ -1,0 +1,32 @@
+{
+  "collections": [
+    {
+      "slug": "stripling",
+      "title": "stripling",
+      "description": "documenting the energy of youth",
+      "cover": 2,
+      "photos": [2, 22, 30, 7, 9, 50, 14, 19, 32, 40, 66, 3]
+    },
+    {
+      "slug": "decay",
+      "title": "decay",
+      "description": "my roots and rust",
+      "cover": 29,
+      "photos": [29, 13, 12, 24, 63, 8, 4, 11, 15, 31, 52, 65, 5, 54, 55, 37]
+    },
+    {
+      "slug": "some-people",
+      "title": "some people",
+      "description": "everyone is just so damn pretty",
+      "cover": 6,
+      "photos": [6, 1, 16, 27, 35, 38, 44, 64, 57, 51]
+    },
+    {
+      "slug": "other-works",
+      "title": "other works",
+      "cover": 20,
+      "photos": [20, 10, 17, 18, 21, 23, 25, 28, 33, 34, 39, 41, 42, 43, 45, 46, 47, 48, 49, 53, 56, 58, 59, 60, 61, 62]
+    }
+  ],
+  "excluded": [26, 36]
+}

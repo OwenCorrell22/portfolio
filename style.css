@@ -16,27 +16,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  cursor: none !important;
-}
-
-.custom-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 28px;
-  height: 28px;
-  border: 1.5px solid #000;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
-  transform: translate(-50%, -50%);
-  will-change: left, top;
-}
-
-.custom-cursor.hovering {
-  width: 40px;
-  height: 40px;
-  border-width: 1px;
 }
 
 html {
@@ -46,8 +25,20 @@ html {
   color: #000;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 body {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
   background-color: #fff;
   color: #000;
   font-size: 1rem;
@@ -73,6 +64,8 @@ nav {
   gap: 2rem;
   padding: 3rem 2.5rem 2.5rem;
   z-index: 100;
+  background-color: transparent;
+  color: #000;
 }
 
 .name {
@@ -155,7 +148,7 @@ main {
   color: #000;
 }
 
-nav, footer {
+footer {
   background-color: #fff;
   color: #000;
 }
@@ -231,6 +224,11 @@ main.home-simple {
 .film-page--links {
   justify-content: center;
   min-height: 65vh;
+}
+
+.film-links--in-stack {
+  max-width: none;
+  padding: 0;
 }
 
 .film-links {
@@ -320,6 +318,14 @@ main.home-simple {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 0.3rem;
+}
+
+.tech-card-eyebrow {
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.45);
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  margin-bottom: 0.35rem;
 }
 
 .tech-card-title {
@@ -538,6 +544,29 @@ canvas.resume-canvas {
   padding: 0;
 }
 
+.photo-cell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 14rem;
+}
+
+.photo-index {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.5rem;
+  z-index: 2;
+  font-size: 0.65rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  letter-spacing: 0.04em;
+  color: #000;
+  background: transparent;
+  padding: 0;
+  pointer-events: none;
+  line-height: 1;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+}
+
 .photo-gallery img {
   width: 100%;
   height: 100%;
@@ -552,6 +581,164 @@ canvas.resume-canvas {
 
 .photo-gallery img:hover { filter: brightness(0.85); }
 .photo-gallery img.visible { opacity: 1; }
+
+.photo-collection {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.photo-collection img {
+  opacity: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-gallery--collections {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  width: 100%;
+  max-width: min(52rem, 100%);
+  grid-template-columns: unset;
+  grid-auto-rows: unset;
+}
+
+.photo-collection-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity var(--t-fast);
+}
+
+.photo-collection-entry:hover {
+  opacity: 0.92;
+}
+
+.photo-collection-title {
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  color: #000;
+  line-height: 1.2;
+}
+
+.photo-collection-desc {
+  display: block;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #000;
+  letter-spacing: 0.01em;
+  max-width: 36rem;
+  margin-bottom: 0.35rem;
+}
+
+.photo-collection-card {
+  display: block;
+  width: 100%;
+  height: min(58vh, 40rem);
+  min-height: 20rem;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.photo-gallery--collections .photo-collection-card img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  opacity: 1;
+  cursor: pointer;
+  transition: filter var(--t-fast);
+}
+
+.photo-gallery--collections .photo-collection-card img:hover {
+  filter: brightness(0.9);
+}
+
+main.collection-page {
+  padding: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.collection-page {
+  position: relative;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 3rem 0 1.5rem;
+  margin-left: 13.5rem;
+  width: calc(100% - 13.5rem);
+  min-height: auto;
+  box-sizing: border-box;
+}
+
+.collection-header {
+  padding: 0 1.25rem 0.5rem;
+}
+
+.collection-title {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  margin-bottom: 0.35rem;
+  color: #000;
+}
+
+.collection-desc {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #000;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.5rem;
+  max-width: 36rem;
+}
+
+.collection-back {
+  font-size: 0.75rem;
+  color: #000;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.collection-back:hover {
+  opacity: 0.5;
+}
+
+.collection-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.collection-page .collection-item {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  min-height: calc(100dvh - 3rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.75rem;
+  box-sizing: border-box;
+  content-visibility: auto;
+  contain-intrinsic-size: 100dvh 100vw;
+}
+
+.collection-page .collection-item img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: calc(100dvh - 3.5rem);
+  height: auto;
+  object-fit: contain;
+}
 
 .about-content {
   display: flex;
@@ -658,7 +845,7 @@ footer span {
 .vd-page {
   position: relative;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   padding: 5rem 2rem;
   margin-left: 13.5rem;
@@ -667,10 +854,37 @@ footer span {
   box-sizing: border-box;
 }
 
+.film-page.vd-page {
+  align-items: flex-start;
+  padding-top: 5rem;
+}
+
+.film-page.vd-page .vd-stack {
+  align-items: flex-start;
+  margin: 0;
+}
+
+.film-page.vd-page .film-links {
+  align-self: flex-start;
+  padding: 0;
+}
+
+.film-page.vd-page .film-links .film-youtube-btn {
+  text-align: left;
+}
+
+.film-page.vd-page .vd-section,
+.film-page.vd-page .vd-youtube,
+.film-page.vd-page .vd-spotify,
+.film-page.vd-page .vd-link {
+  align-self: flex-start;
+}
+
 .vd-stack {
   width: min(26rem, 100%);
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 3rem;
   text-align: left;
 }
@@ -702,6 +916,8 @@ footer span {
 .vd-gifs img {
   display: block;
   width: 100%;
+  max-width: 100%;
+  height: auto;
   margin-left: auto;
   margin-right: auto;
 }
@@ -770,6 +986,15 @@ footer span {
     padding: 0;
   }
 
+  .photo-gallery--collections {
+    gap: 2.25rem;
+  }
+
+  .photo-collection-card {
+    height: min(50vh, 28rem);
+    min-height: 16rem;
+  }
+
   .film-page {
     padding-top: 2rem;
   }
@@ -820,6 +1045,16 @@ footer span {
     margin-left: 0;
     width: 100%;
     padding: 2rem 1.5rem;
+  }
+
+  .collection-page {
+    margin-left: 0;
+    width: 100%;
+    padding: 2rem 0 3rem;
+  }
+
+  .collection-header {
+    padding: 0 1.5rem 1rem;
   }
 
   .archive-sidebar {

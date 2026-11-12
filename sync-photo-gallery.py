@@ -3,6 +3,7 @@
 import json
 import re
 from pathlib import Path
+from typing import Optional
 
 ROOT = Path(__file__).resolve().parent
 
@@ -33,6 +34,31 @@ def entry_cover_src(col: dict, img_dir: str = "thumbs") -> str:
     return f"assets/{img_dir}/{col['cover']}.jpg"
 
 
+def entry_preview_src(col: dict, img_dir: str = "thumbs") -> Optional[str]:
+    if col.get("previewSrc"):
+        return col["previewSrc"]
+    if col.get("preview") is not None:
+        return f"assets/{img_dir}/{col['preview']}.jpg"
+    photos = col.get("photos") or []
+    if not photos:
+        return None
+    cover = col.get("cover")
+    preview_id: Optional[int] = None
+    if cover is not None:
+        if photos[0] == cover and len(photos) > 1:
+            preview_id = photos[1]
+        else:
+            for pid in photos:
+                if pid != cover:
+                    preview_id = pid
+                    break
+    elif len(photos) > 1:
+        preview_id = photos[1]
+    if preview_id is None:
+        return None
+    return f"assets/{img_dir}/{preview_id}.jpg"
+
+
 def build_gallery_entries(
     collections: list, start_idx: int = 1, img_dir: str = "thumbs"
 ) -> tuple[list[str], int]:
@@ -42,16 +68,23 @@ def build_gallery_entries(
         slug = col["slug"]
         title = col.get("title", slug)
         cover_src = entry_cover_src(col, img_dir)
+        preview_src = entry_preview_src(col, img_dir)
         desc = col.get("description", "").strip()
         desc_html = (
             f'\n        <span class="photo-collection-desc">{desc}</span>' if desc else ""
+        )
+        preview_html = (
+            f'\n          <img src="{preview_src}" alt="" class="photo-collection-preview" '
+            f'loading="lazy" decoding="async" aria-hidden="true">'
+            if preview_src
+            else ""
         )
         lines.append(
             f'      <a href="{slug}.html" class="photo-collection-entry">\n'
             f'        <span class="photo-collection-title">{title}</span>{desc_html}\n'
             f'        <span class="photo-collection-card">\n'
             f'          <img src="{cover_src}" alt="{title} collection"{load_attrs(idx)} '
-            f'decoding="async" class="visible">\n'
+            f'decoding="async" class="photo-collection-cover visible">{preview_html}\n'
             f"        </span>\n"
             f"      </a>"
         )

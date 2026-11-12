@@ -4,6 +4,7 @@
       "slug": "commercial-work",
       "title": "commercial work",
       "cover": 67,
+      "preview": 78,
       "photos": [],
       "subcollections": [
         {
@@ -22,6 +23,7 @@
           "slug": "luco",
           "title": "LUCØ",
           "coverSrc": "assets/event-coverage/luco.gif",
+          "previewSrc": "assets/event-coverage/luco.gif",
           "caption": "footage taken on a Samsung Hmx F900",
           "photos": []
         }

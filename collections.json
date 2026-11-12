@@ -1,6 +1,33 @@
 {
   "collections": [
     {
+      "slug": "commercial-work",
+      "title": "commercial work",
+      "cover": 67,
+      "photos": [],
+      "subcollections": [
+        {
+          "slug": "ape-drums-for-solara-sounds",
+          "title": "Ape Drums for Solara Sounds",
+          "cover": 68,
+          "photos": [68, 77, 69, 70, 71, 72, 73, 74, 75, 76]
+        },
+        {
+          "slug": "nick-cheo-for-nukds",
+          "title": "Nick Cheo for Nuk;Ds",
+          "cover": 78,
+          "photos": [78, 79, 80, 81, 82, 83, 84]
+        },
+        {
+          "slug": "luco",
+          "title": "LUCØ",
+          "coverSrc": "assets/event-coverage/luco.gif",
+          "caption": "footage taken on a Samsung Hmx F900",
+          "photos": []
+        }
+      ]
+    },
+    {
       "slug": "stripling",
       "title": "stripling",
       "description": "documenting the energy of youth",
@@ -8,18 +35,17 @@
       "photos": [2, 22, 30, 7, 9, 50, 14, 19, 32, 40, 66, 3]
     },
     {
+      "slug": "portraiture",
+      "title": "portraiture",
+      "cover": 6,
+      "photos": [6, 1, 16, 27, 35, 38, 44, 64, 57, 51]
+    },
+    {
       "slug": "decay",
       "title": "decay",
       "description": "my roots and rust",
       "cover": 29,
       "photos": [29, 13, 12, 24, 63, 8, 4, 11, 15, 31, 52, 65, 5, 54, 55, 37]
-    },
-    {
-      "slug": "some-people",
-      "title": "some people",
-      "description": "everyone is just so damn pretty",
-      "cover": 6,
-      "photos": [6, 1, 16, 27, 35, 38, 44, 64, 57, 51]
     },
     {
       "slug": "other-works",

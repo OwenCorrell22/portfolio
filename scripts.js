@@ -5,7 +5,7 @@
     'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
   var WORK_PAGE =
-    /\/(?:photography|code|film|resume|stripling|decay|some-people|other-works)\.html$/;
+    /\/(?:photography|code|film|resume|commercial-work|stripling|decay|ape-drums-for-solara-sounds|nick-cheo-for-nukds|luco|portraiture|other-works)\.html$/;
 
   document.addEventListener('DOMContentLoaded', function () {
     initHexAnimation();

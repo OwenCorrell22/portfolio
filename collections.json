@@ -30,6 +30,13 @@
       ]
     },
     {
+      "kind": "external-link",
+      "title": "WSN",
+      "description": "published work for NYU's independent student newspaper",
+      "href": "https://nyunews.com/staff_name/owen-correll/",
+      "cover": 85
+    },
+    {
       "slug": "stripling",
       "title": "stripling",
       "description": "documenting the energy of youth",
@@ -56,5 +63,5 @@
       "photos": [20, 10, 17, 18, 21, 23, 25, 28, 33, 34, 39, 41, 42, 43, 45, 46, 47, 48, 49, 53, 56, 58, 59, 60, 61, 62]
     }
   ],
-  "excluded": [26, 36]
+  "excluded": [26, 36, 85]
 }

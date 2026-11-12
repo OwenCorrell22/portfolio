@@ -16,11 +16,18 @@ def load_attrs(i: int) -> str:
     return ' loading="lazy"'
 
 
+def is_photo_collection(col: dict) -> bool:
+    return col.get("kind") != "external-link"
+
+
 def member_ids(collections: list, excluded: set[int]) -> set[int]:
     members: set[int] = set(excluded)
     for col in collections:
+        if not is_photo_collection(col):
+            continue
         members.update(col.get("photos", []))
-        members.add(col["cover"])
+        if "cover" in col:
+            members.add(col["cover"])
         for sub in col.get("subcollections", []):
             members.update(sub.get("photos", []))
             if "cover" in sub:
@@ -65,20 +72,30 @@ def build_gallery_entries(
     lines: list[str] = []
     idx = start_idx
     for col in collections:
-        slug = col["slug"]
-        title = col.get("title", slug)
-        cover_src = entry_cover_src(col, img_dir)
-        preview_src = entry_preview_src(col, img_dir)
+        title = col.get("title", col.get("slug", ""))
         desc = col.get("description", "").strip()
         desc_html = (
             f'\n        <span class="photo-collection-desc">{desc}</span>' if desc else ""
         )
-        preview_html = (
-            f'\n          <img src="{preview_src}" alt="" class="photo-collection-preview" '
-            f'loading="lazy" decoding="async" aria-hidden="true">'
-            if preview_src
-            else ""
-        )
+        if col.get("kind") == "external-link":
+            href = col["href"]
+            cover_src = entry_cover_src(col, img_dir)
+            lines.append(
+                f'      <div class="photo-collection-block photo-collection-external">\n'
+                f'        <span class="photo-collection-title">{title}</span>{desc_html}\n'
+                f'        <a href="{href}" class="photo-collection-card-link" target="_blank" '
+                f'rel="noopener noreferrer" aria-label="{title}">\n'
+                f'          <span class="photo-collection-card">\n'
+                f'          <img src="{cover_src}" alt="{title}"{load_attrs(idx)} '
+                f'decoding="async" class="photo-collection-cover visible">\n'
+                f"          </span>\n"
+                f"        </a>\n"
+                f"      </div>"
+            )
+            idx += 1
+            continue
+        slug = col["slug"]
+        cover_src = entry_cover_src(col, img_dir)
         lines.append(
             f'      <div class="photo-collection-block">\n'
             f'        <span class="photo-collection-title">{title}</span>{desc_html}\n'
@@ -86,7 +103,7 @@ def build_gallery_entries(
             f'aria-label="{title}">\n'
             f'          <span class="photo-collection-card">\n'
             f'          <img src="{cover_src}" alt="{title} collection"{load_attrs(idx)} '
-            f'decoding="async" class="photo-collection-cover visible">{preview_html}\n'
+            f'decoding="async" class="photo-collection-cover visible">\n'
             f"          </span>\n"
             f"        </a>\n"
             f"      </div>"
@@ -244,6 +261,8 @@ def main() -> None:
     photo_html.write_text(html[:start] + gallery + "\n" + html[end:])
 
     for col in collections:
+        if not is_photo_collection(col):
+            continue
         slug = col["slug"]
         page = ROOT / f"{slug}.html"
         subs = col.get("subcollections", [])
@@ -256,7 +275,7 @@ def main() -> None:
                     update_collection_header(
                         sub_page,
                         sub.get("title", sub["slug"]),
-                        "",
+                        sub.get("description", ""),
                         back_href=f"{slug}.html",
                     )
                     if sub.get("coverSrc") and not sub.get("photos"):
@@ -270,7 +289,8 @@ def main() -> None:
             )
             update_collection_stack(page, col["photos"])
 
-    print(f"OK: {len(collections)} collections synced")
+    n = sum(1 for c in collections if is_photo_collection(c))
+    print(f"OK: {n} collections synced")
 
 
 if __name__ == "__main__":

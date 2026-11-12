@@ -482,7 +482,6 @@ main.site-page {
   letter-spacing: 0;
 }
 
-.explorer-item-desc,
 .explorer-window-desc {
   display: none !important;
 }
@@ -680,12 +679,17 @@ main.site-page {
 
 .explorer-item-desc {
   margin: 0.15rem 0 0;
-  max-width: 7.5rem;
+  max-width: 9.5rem;
   margin-left: auto;
   margin-right: auto;
   font-size: 0.65rem;
   line-height: 1.35;
   color: var(--c-text-muted);
+  font-style: italic;
+}
+
+.photo-page .explorer-item-desc {
+  display: none;
 }
 
 .photo-tags {

@@ -7,7 +7,7 @@ from typing import Optional
 
 ROOT = Path(__file__).resolve().parent
 EXPLORER_ROOT = "C:/My Documents/Photos"
-STYLE_VERSION = 53
+STYLE_VERSION = 54
 SCRIPT_VERSION = 28
 
 
@@ -49,8 +49,18 @@ def explorer_address_path(*parts: str) -> str:
     return f"{EXPLORER_ROOT}/{suffix}" if suffix else EXPLORER_ROOT
 
 
+def folder_desc_html(description: str, include_descriptions: bool) -> str:
+    desc = (description or "").strip()
+    if not include_descriptions or not desc:
+        return ""
+    return f'\n          <span class="explorer-item-desc">{desc}</span>'
+
+
 def build_folder_entries(
-    collections: list, start_idx: int = 1, img_dir: str = "thumbs"
+    collections: list,
+    start_idx: int = 1,
+    img_dir: str = "thumbs",
+    include_descriptions: bool = False,
 ) -> tuple[list[str], int]:
     lines: list[str] = []
     idx = start_idx
@@ -67,21 +77,25 @@ def build_folder_entries(
                 f'            <img src="{cover_src}" alt=""{load_attrs(idx)} decoding="async" '
                 f'class="explorer-item-thumb visible">\n'
                 f"          </span>\n"
-                f'          <span class="explorer-item-label">{title}</span>\n'
+                f'          <span class="explorer-item-label">{title}</span>'
+                f'{folder_desc_html(col.get("description", ""), include_descriptions)}\n'
                 f"        </a>\n"
                 f"      </article>"
             )
             idx += 1
             continue
         slug = col["slug"]
+        desc = col.get("description", "")
+        aria = f"{title}. {desc}" if include_descriptions and (desc or "").strip() else title
         lines.append(
             f'      <article class="explorer-item explorer-item--folder">\n'
-            f'        <a href="{slug}.html" class="explorer-item-link" aria-label="{title}">\n'
+            f'        <a href="{slug}.html" class="explorer-item-link" aria-label="{aria}">\n'
             f'          <span class="explorer-item-icon" aria-hidden="true">\n'
             f'            <img src="{cover_src}" alt=""{load_attrs(idx)} decoding="async" '
             f'class="explorer-item-thumb visible">\n'
             f"          </span>\n"
-            f'          <span class="explorer-item-label">{title}</span>\n'
+            f'          <span class="explorer-item-label">{title}</span>'
+            f'{folder_desc_html(desc, include_descriptions)}\n'
             f"        </a>\n"
             f"      </article>"
         )
@@ -124,7 +138,9 @@ def build_root_gallery(collections: list, excluded: set[int]) -> str:
 
 
 def build_hub_gallery(subcollections: list) -> str:
-    lines, _ = build_folder_entries(subcollections, start_idx=1, img_dir="thumbs")
+    lines, _ = build_folder_entries(
+        subcollections, start_idx=1, img_dir="thumbs", include_descriptions=True
+    )
     count = len(subcollections)
     return (
         f'    <div class="explorer-view explorer-view--icons">\n'

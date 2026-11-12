@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#1c1c1b">
   <meta name="description" content="Photo by Owen Correll.">
   <title>Photo – Owen Correll</title>
-  <link rel="stylesheet" href="style.css?v=41">
+  <link rel="stylesheet" href="style.css?v=47">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 </head>
 
@@ -36,59 +36,60 @@
   </p>
 
   <main class="photo-page">
-    <div class="photo-gallery photo-gallery--collections">
-      <div class="photo-collection-block">
-        <span class="photo-collection-title">commercial work</span>
-        <a href="commercial-work.html" class="photo-collection-card-link" aria-label="commercial work">
-          <span class="photo-collection-card">
-          <img src="assets/thumbs/67.jpg" alt="commercial work collection" loading="eager" fetchpriority="high" decoding="async" class="photo-collection-cover visible">
-          </span>
-        </a>
+    <section class="explorer-window explorer-window--root" id="sync-explorer-body">
+      <header class="explorer-titlebar">
+        <span class="explorer-titlebar-text">My Pictures — Owen Correll</span>
+      </header>
+      <div class="explorer-toolbar" role="toolbar">
+        <a href="index.html" class="explorer-tool explorer-tool--back" aria-label="Back">←</a>
       </div>
-      <div class="photo-collection-block photo-collection-external">
-        <span class="photo-collection-title">WSN</span>
-        <span class="photo-collection-desc">published work for NYU's independent student newspaper</span>
-        <a href="https://nyunews.com/staff_name/owen-correll/" class="photo-collection-card-link" target="_blank" rel="noopener noreferrer" aria-label="WSN">
-          <span class="photo-collection-card">
-          <img src="assets/thumbs/85.jpg" alt="WSN" loading="eager" fetchpriority="high" decoding="async" class="photo-collection-cover visible">
+      <p class="explorer-address">
+        <span class="explorer-address-label">Address</span>
+        <span class="explorer-address-path">C:/My Documents/Photos</span>
+      </p>
+      <!-- sync:explorer-body:start -->
+    <div class="explorer-view explorer-view--icons">
+      <div class="photo-gallery photo-gallery--icons photo-gallery--folders">
+      <article class="explorer-item explorer-item--folder">
+        <a href="commercial-work.html" class="explorer-item-link" aria-label="live & culture">
+          <span class="explorer-item-icon" aria-hidden="true">
+            <img src="assets/thumbs/67.jpg" alt="" loading="eager" fetchpriority="high" decoding="async" class="explorer-item-thumb visible">
           </span>
+          <span class="explorer-item-label">live & culture</span>
         </a>
-      </div>
-      <div class="photo-collection-block">
-        <span class="photo-collection-title">stripling</span>
-        <span class="photo-collection-desc">documenting the energy of youth</span>
-        <a href="stripling.html" class="photo-collection-card-link" aria-label="stripling">
-          <span class="photo-collection-card">
-          <img src="assets/thumbs/2.jpg" alt="stripling collection" loading="eager" fetchpriority="high" decoding="async" class="photo-collection-cover visible">
+      </article>
+      <article class="explorer-item explorer-item--folder explorer-item--external">
+        <a href="https://nyunews.com/staff_name/owen-correll/" class="explorer-item-link" target="_blank" rel="noopener noreferrer" aria-label="editorial & institutions">
+          <span class="explorer-item-icon" aria-hidden="true">
+            <img src="assets/thumbs/85.jpg" alt="" loading="eager" fetchpriority="high" decoding="async" class="explorer-item-thumb visible">
           </span>
+          <span class="explorer-item-label">editorial & institutions</span>
         </a>
-      </div>
-      <div class="photo-collection-block">
-        <span class="photo-collection-title">portraiture</span>
-        <a href="portraiture.html" class="photo-collection-card-link" aria-label="portraiture">
-          <span class="photo-collection-card">
-          <img src="assets/thumbs/6.jpg" alt="portraiture collection" loading="eager" decoding="async" class="photo-collection-cover visible">
+      </article>
+      <article class="explorer-item explorer-item--folder">
+        <a href="portraiture.html" class="explorer-item-link" aria-label="portraits">
+          <span class="explorer-item-icon" aria-hidden="true">
+            <img src="assets/thumbs/6.jpg" alt="" loading="eager" fetchpriority="high" decoding="async" class="explorer-item-thumb visible">
           </span>
+          <span class="explorer-item-label">portraits</span>
         </a>
-      </div>
-      <div class="photo-collection-block">
-        <span class="photo-collection-title">decay</span>
-        <span class="photo-collection-desc">my roots and rust</span>
-        <a href="decay.html" class="photo-collection-card-link" aria-label="decay">
-          <span class="photo-collection-card">
-          <img src="assets/thumbs/29.jpg" alt="decay collection" loading="eager" decoding="async" class="photo-collection-cover visible">
+      </article>
+      <article class="explorer-item explorer-item--folder">
+        <a href="series-prints.html" class="explorer-item-link" aria-label="series & prints">
+          <span class="explorer-item-icon" aria-hidden="true">
+            <img src="assets/thumbs/2.jpg" alt="" loading="eager" decoding="async" class="explorer-item-thumb visible">
           </span>
+          <span class="explorer-item-label">series & prints</span>
         </a>
-      </div>
-      <div class="photo-collection-block">
-        <span class="photo-collection-title">other works</span>
-        <a href="other-works.html" class="photo-collection-card-link" aria-label="other works">
-          <span class="photo-collection-card">
-          <img src="assets/thumbs/20.jpg" alt="other works collection" loading="eager" decoding="async" class="photo-collection-cover visible">
-          </span>
-        </a>
+      </article>
       </div>
     </div>
+    <footer class="explorer-statusbar">
+      <span class="explorer-statusbar-section">4 object(s)</span>
+      <span class="explorer-statusbar-section explorer-statusbar-grow">35mm archive</span>
+    </footer>
+    <!-- sync:explorer-body:end -->
+    </section>
   <footersub>
     & more
   </footersub>
@@ -98,6 +99,6 @@
     <span>&copy; 2025 Owen Correll</span>
   </footer>
 
-  <script src="scripts.js?v=26"></script>
+  <script src="scripts.js?v=27"></script>
 </body>
 </html>

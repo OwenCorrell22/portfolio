@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 ROOT = Path(__file__).resolve().parent
+EXPLORER_ROOT = "C:/My Documents/Photos"
 
 
 def load_attrs(i: int) -> str:
@@ -41,87 +42,60 @@ def entry_cover_src(col: dict, img_dir: str = "thumbs") -> str:
     return f"assets/{img_dir}/{col['cover']}.jpg"
 
 
-def entry_preview_src(col: dict, img_dir: str = "thumbs") -> Optional[str]:
-    if col.get("previewSrc"):
-        return col["previewSrc"]
-    if col.get("preview") is not None:
-        return f"assets/{img_dir}/{col['preview']}.jpg"
-    photos = col.get("photos") or []
-    if not photos:
-        return None
-    cover = col.get("cover")
-    preview_id: Optional[int] = None
-    if cover is not None:
-        if photos[0] == cover and len(photos) > 1:
-            preview_id = photos[1]
-        else:
-            for pid in photos:
-                if pid != cover:
-                    preview_id = pid
-                    break
-    elif len(photos) > 1:
-        preview_id = photos[1]
-    if preview_id is None:
-        return None
-    return f"assets/{img_dir}/{preview_id}.jpg"
+def explorer_address_path(*parts: str) -> str:
+    suffix = "/".join(parts) if parts else ""
+    return f"{EXPLORER_ROOT}/{suffix}" if suffix else EXPLORER_ROOT
 
 
-def build_gallery_entries(
+def build_folder_entries(
     collections: list, start_idx: int = 1, img_dir: str = "thumbs"
 ) -> tuple[list[str], int]:
     lines: list[str] = []
     idx = start_idx
     for col in collections:
         title = col.get("title", col.get("slug", ""))
-        desc = col.get("description", "").strip()
-        desc_html = (
-            f'\n        <span class="photo-collection-desc">{desc}</span>' if desc else ""
-        )
+        cover_src = entry_cover_src(col, img_dir)
         if col.get("kind") == "external-link":
             href = col["href"]
-            cover_src = entry_cover_src(col, img_dir)
             lines.append(
-                f'      <div class="photo-collection-block photo-collection-external">\n'
-                f'        <span class="photo-collection-title">{title}</span>{desc_html}\n'
-                f'        <a href="{href}" class="photo-collection-card-link" target="_blank" '
+                f'      <article class="explorer-item explorer-item--folder explorer-item--external">\n'
+                f'        <a href="{href}" class="explorer-item-link" target="_blank" '
                 f'rel="noopener noreferrer" aria-label="{title}">\n'
-                f'          <span class="photo-collection-card">\n'
-                f'          <img src="{cover_src}" alt="{title}"{load_attrs(idx)} '
-                f'decoding="async" class="photo-collection-cover visible">\n'
+                f'          <span class="explorer-item-icon" aria-hidden="true">\n'
+                f'            <img src="{cover_src}" alt=""{load_attrs(idx)} decoding="async" '
+                f'class="explorer-item-thumb visible">\n'
                 f"          </span>\n"
+                f'          <span class="explorer-item-label">{title}</span>\n'
                 f"        </a>\n"
-                f"      </div>"
+                f"      </article>"
             )
             idx += 1
             continue
         slug = col["slug"]
-        cover_src = entry_cover_src(col, img_dir)
         lines.append(
-            f'      <div class="photo-collection-block">\n'
-            f'        <span class="photo-collection-title">{title}</span>{desc_html}\n'
-            f'        <a href="{slug}.html" class="photo-collection-card-link" '
-            f'aria-label="{title}">\n'
-            f'          <span class="photo-collection-card">\n'
-            f'          <img src="{cover_src}" alt="{title} collection"{load_attrs(idx)} '
-            f'decoding="async" class="photo-collection-cover visible">\n'
+            f'      <article class="explorer-item explorer-item--folder">\n'
+            f'        <a href="{slug}.html" class="explorer-item-link" aria-label="{title}">\n'
+            f'          <span class="explorer-item-icon" aria-hidden="true">\n'
+            f'            <img src="{cover_src}" alt=""{load_attrs(idx)} decoding="async" '
+            f'class="explorer-item-thumb visible">\n'
             f"          </span>\n"
+            f'          <span class="explorer-item-label">{title}</span>\n'
             f"        </a>\n"
-            f"      </div>"
+            f"      </article>"
         )
         idx += 1
     return lines, idx
 
 
-def build_gallery(collections: list, excluded: set[int]) -> str:
+def build_root_gallery(collections: list, excluded: set[int]) -> str:
     member_set = member_ids(collections, excluded)
     max_id = max(66, max(member_set) if member_set else 66)
     singles = [n for n in range(1, max_id + 1) if n not in member_set]
-    gallery_class = "photo-gallery photo-gallery--collections" if not singles else "photo-gallery"
 
-    lines, idx = build_gallery_entries(collections)
+    lines, idx = build_folder_entries(collections)
     for n in singles:
         lines.append(
-            f'      <div class="photo-cell">\n'
+            f'      <div class="photo-cell explorer-item explorer-item--file">\n'
             f'        <span class="photo-index">{n}</span>\n'
             f'        <img src="assets/thumbs/{n}.jpg" alt="Photograph {n} by Owen Correll"{load_attrs(idx)} '
             f'decoding="async" data-full="assets/view/{n}.jpg" data-thumb="assets/thumbs/{n}.jpg">\n'
@@ -129,60 +103,124 @@ def build_gallery(collections: list, excluded: set[int]) -> str:
         )
         idx += 1
 
-    return f"    <div class=\"{gallery_class}\">\n" + "\n".join(lines) + "\n    </div>"
+    obj_count = len(collections) + len(singles)
+    gallery_class = "photo-gallery photo-gallery--icons photo-gallery--folders"
+    if singles:
+        gallery_class += " photo-gallery--mixed"
+
+    return (
+        f'    <div class="explorer-view explorer-view--icons">\n'
+        f'      <div class="{gallery_class}">\n'
+        + "\n".join(lines)
+        + f"\n      </div>\n"
+        f"    </div>\n"
+        f'    <footer class="explorer-statusbar">\n'
+        f'      <span class="explorer-statusbar-section">{obj_count} object(s)</span>\n'
+        f'      <span class="explorer-statusbar-section explorer-statusbar-grow">35mm archive</span>\n'
+        f"    </footer>"
+    )
 
 
 def build_hub_gallery(subcollections: list) -> str:
-    lines, _ = build_gallery_entries(subcollections, start_idx=1, img_dir="view")
-    return f'    <div class="photo-gallery photo-gallery--collections">\n' + "\n".join(lines) + "\n    </div>"
+    lines, _ = build_folder_entries(subcollections, start_idx=1, img_dir="thumbs")
+    count = len(subcollections)
+    return (
+        f'    <div class="explorer-view explorer-view--icons">\n'
+        f'      <div class="photo-gallery photo-gallery--icons photo-gallery--folders">\n'
+        + "\n".join(lines)
+        + f"\n      </div>\n"
+        f"    </div>\n"
+        f'    <footer class="explorer-statusbar">\n'
+        f'      <span class="explorer-statusbar-section">{count} folder(s)</span>\n'
+        f'      <span class="explorer-statusbar-section explorer-statusbar-grow"></span>\n'
+        f"    </footer>"
+    )
 
 
-def update_collection_header(
-    path: Path, title: str, description: str, back_href: str = "photography.html"
-) -> None:
-    desc_block = (
-        f'\n      <p class="collection-desc">{description}</p>' if description.strip() else ""
+def build_photo_icon_stack(photos: list[int]) -> str:
+    cells = []
+    for i, n in enumerate(photos):
+        cells.append(
+            f'        <div class="photo-cell explorer-item explorer-item--file">\n'
+            f'          <span class="photo-index">{n}</span>\n'
+            f'          <img src="assets/view/{n}.jpg" alt="Photograph {n}"{load_attrs(i + 1)} '
+            f'decoding="async" data-full="assets/view/{n}.jpg" data-thumb="assets/view/{n}.jpg">\n'
+            f"        </div>"
+        )
+    count = len(photos)
+    return (
+        f'    <div class="explorer-view explorer-view--icons explorer-view--collection-photos">\n'
+        f'      <div class="collection-stack photo-gallery photo-gallery--icons photo-gallery--photos">\n'
+        + "\n".join(cells)
+        + f"\n      </div>\n"
+        f"    </div>\n"
+        f'    <footer class="explorer-statusbar">\n'
+        f'      <span class="explorer-statusbar-section">{count} object(s)</span>\n'
+        f'      <span class="explorer-statusbar-section explorer-statusbar-grow">double-click to open</span>\n'
+        f"    </footer>"
     )
-    header = (
-        f'    <header class="collection-header">\n'
-        f'      <a href="{back_href}" class="collection-back" aria-label="Back">←</a>\n'
-        f'      <p class="collection-title">{title}</p>{desc_block}\n'
-        f"    </header>"
+
+
+def build_explorer_open(window_title: str, address: str, back_href: str) -> str:
+    return (
+        f'    <section class="explorer-window">\n'
+        f'      <header class="explorer-titlebar">\n'
+        f'        <span class="explorer-titlebar-text">{window_title}</span>\n'
+        f"      </header>\n"
+        f'      <div class="explorer-toolbar" role="toolbar">\n'
+        f'        <a href="{back_href}" class="explorer-tool explorer-tool--back" aria-label="Back">←</a>\n'
+        f"      </div>\n"
+        f'      <p class="explorer-address">\n'
+        f'        <span class="explorer-address-label">Address</span>\n'
+        f'        <span class="explorer-address-path">{address}</span>\n'
+        f"      </p>\n"
     )
+
+
+def migrate_hub_to_explorer(path: Path, col: dict) -> None:
     text = path.read_text()
+    if 'class="explorer-window"' in text:
+        return
+    window, address, _ = hub_explorer_meta(col)
+    chrome = build_explorer_open(window, address, "photography.html")
     text = re.sub(
-        r"    <header class=\"collection-header\">.*?</header>",
-        header,
+        r"    <header class=\"collection-header\">.*?</header>\n?",
+        "",
         text,
         count=1,
         flags=re.DOTALL,
     )
+    text = re.sub(
+        r'(<main class="collection-page)(?: collection-hub)?">\n',
+        r'\1 collection-hub">\n' + chrome + "\n",
+        text,
+        count=1,
+    )
     path.write_text(text)
 
 
-def replace_hub_gallery(path: Path, gallery_html: str) -> None:
+def replace_hub_content(path: Path, body_html: str) -> None:
     text = path.read_text()
-    if 'class="collection-stack"' in text:
+    body = body_html.strip()
+    if 'class="explorer-view"' in text:
         text = re.sub(
-            r'    <div class="collection-stack">.*?</div>\n  </main>',
-            gallery_html + "\n  </main>",
+            r"    <div class=\"explorer-view explorer-view--icons\">.*?"
+            r"    </footer>\n(?:    </section>\n)?",
+            body + "\n",
             text,
             count=1,
             flags=re.DOTALL,
         )
-    else:
-        gallery = gallery_html.strip()
-
-        def _inject_hub(match: re.Match[str]) -> str:
-            return match.group(1) + gallery + "\n\n  </main>"
-
+    elif re.search(r'class="photo-gallery photo-gallery', text):
         text = re.sub(
-            r"(    </header>\n)(.*?)(  </main>)",
-            _inject_hub,
+            r"\s*<div class=\"photo-gallery photo-gallery[^\"]*\">.*?(?=\s*</main>)",
+            "\n" + body + "\n",
             text,
             count=1,
             flags=re.DOTALL,
         )
+    elif 'class="explorer-window"' in text:
+        text = text.replace("  </main>", body + "\n  </main>", 1)
     if "collection-hub" not in text and "collection-page" in text:
         text = text.replace(
             '<main class="collection-page">',
@@ -192,25 +230,21 @@ def replace_hub_gallery(path: Path, gallery_html: str) -> None:
     path.write_text(text)
 
 
-def update_collection_media(path: Path, sub: dict) -> None:
-    src = sub["coverSrc"]
-    title = sub.get("title", sub["slug"])
-    caption = sub.get("caption", sub.get("description", "")).strip()
-    caption_html = f'\n      <p class="collection-media-caption">{caption}</p>' if caption else ""
-    stack = (
-        '    <div class="collection-stack collection-stack--media">\n'
-        f'      <figure class="collection-item collection-item--media">\n'
-        f'        <img src="{src}" alt="{title}" loading="eager" decoding="async">\n'
-        f"      </figure>{caption_html}\n"
-        "    </div>"
-    )
+def rebuild_collection_main(
+    path: Path, chrome: str, body_html: str, *, hub: bool = False
+) -> None:
     text = path.read_text()
-    def _inject_media(match: re.Match[str]) -> str:
-        return match.group(1) + stack + "\n\n  </main>"
-
+    hub_class = " collection-hub" if hub else ""
+    main = (
+        f'  <main class="collection-page{hub_class}">\n'
+        f"{chrome.rstrip()}\n"
+        f"{body_html.strip()}\n"
+        f"    </section>\n"
+        f"  </main>"
+    )
     text = re.sub(
-        r"(    </header>\n)(.*?)(  </main>)",
-        _inject_media,
+        r'  <main class="collection-page[^"]*">.*?</main>',
+        main,
         text,
         count=1,
         flags=re.DOTALL,
@@ -218,31 +252,138 @@ def update_collection_media(path: Path, sub: dict) -> None:
     path.write_text(text)
 
 
-def update_collection_stack(path: Path, photos: list[int]) -> None:
-    if not photos:
-        return
-    figures = []
-    for i, n in enumerate(photos):
-        load = "eager" if i == 0 else "lazy"
-        figures.append(
-            f'      <figure class="collection-item"><span class="photo-index">{n}</span>'
-            f'<img src="assets/view/{n}.jpg" alt="{n}" loading="{load}" decoding="async"></figure>'
+def update_collection_media(path: Path, sub: dict, back_href: str) -> None:
+    src = sub["coverSrc"]
+    title = sub.get("title", sub["slug"])
+    caption = sub.get("caption", sub.get("description", "")).strip()
+    caption_html = (
+        f'\n        <p class="collection-media-caption">{caption}</p>' if caption else ""
+    )
+    body = (
+        f'    <div class="explorer-view explorer-view--media">\n'
+        f'      <div class="collection-stack collection-stack--media">\n'
+        f'        <figure class="collection-item collection-item--media">\n'
+        f'          <img src="{src}" alt="{title}" loading="eager" decoding="async">\n'
+        f"        </figure>{caption_html}\n"
+        f"      </div>\n"
+        f"    </div>\n"
+        f'    <footer class="explorer-statusbar">\n'
+        f'      <span class="explorer-statusbar-section">1 object</span>\n'
+        f'      <span class="explorer-statusbar-section explorer-statusbar-grow">video</span>\n'
+        f"    </footer>"
+    )
+    # caller must rebuild main with chrome + body
+
+
+def sync_photography_page(collections: list, excluded: set[int]) -> None:
+    photo_html = ROOT / "photography.html"
+    html = photo_html.read_text()
+    body = build_root_gallery(collections, excluded)
+    obj_count = len(collections)
+
+    if 'id="sync-explorer-body"' in html:
+        html = re.sub(
+            r"<!-- sync:explorer-body:start -->.*?<!-- sync:explorer-body:end -->",
+            f"<!-- sync:explorer-body:start -->\n{body}\n    <!-- sync:explorer-body:end -->",
+            html,
+            count=1,
+            flags=re.DOTALL,
         )
-    text = path.read_text()
-    if 'class="collection-stack"' not in text:
-        text = text.replace(
-            "  </header>\n",
-            "  </header>\n    <div class=\"collection-stack\">\n"
-            + "\n".join(figures)
-            + "\n    </div>\n",
-            1,
+        html = re.sub(
+            r'(<span class="explorer-statusbar-section">)\d+ object\(s\)(</span>)',
+            rf"\g<1>{obj_count} object(s)\g<2>",
+            html,
+            count=1,
         )
-        path.write_text(text)
-        return
-    start = text.index('    <div class="collection-stack">')
-    end = text.index("    </div>\n  </main>", start)
-    stack = "    <div class=\"collection-stack\">\n" + "\n".join(figures) + "\n    </div>"
-    path.write_text(text[:start] + stack + text[end + len("    </div>") :])
+    elif 'class="explorer-window"' in html:
+        html = re.sub(
+            r"    <div class=\"explorer-view explorer-view--icons\">.*?"
+            r"    </footer>\n",
+            body + "\n",
+            html,
+            count=1,
+            flags=re.DOTALL,
+        )
+    else:
+        m = re.search(r'    <div class="photo-gallery[^"]*">', html)
+        if not m:
+            raise SystemExit("photo-gallery / explorer block not found in photography.html")
+        start = m.start()
+        end = html.index("  <footersub>")
+        html = html[:start] + body + "\n" + html[end:]
+    photo_html.write_text(html)
+
+
+def hub_explorer_meta(col: dict) -> tuple[str, str, str]:
+    slug = col["slug"]
+    title = col.get("title", slug)
+    address = explorer_address_path(title)
+    window = f"{title} — Photos"
+    return window, address, title
+
+
+def sub_explorer_meta(sub: dict, hub: dict) -> tuple[str, str]:
+    hub_title = hub.get("title", hub["slug"])
+    title = sub.get("title", sub["slug"])
+    address = explorer_address_path(hub_title, title)
+    window = f"{title} — Photos"
+    return window, address
+
+
+HUB_PAGE_SHELL = """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark only">
+  <meta name="theme-color" content="#1c1c1b">
+  <meta name="description" content="{title} — photo collection by Owen Correll.">
+  <title>{title} – Owen Correll</title>
+  <link rel="stylesheet" href="style.css?v=42">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="name">Owen Correll</a>
+    <div class="nav-links">
+      <div class="nav-item-with-sub">
+        <button type="button" class="work-toggle">#<span class="nav-id" data-base="4A2F7E">4A2F7E</span>____work</button>
+        <div class="sub-links">
+          <a href="code.html">#<span class="nav-id nav-id--sub" data-base="7F2">7F2</span>___code</a>
+          <a href="photography.html">#<span class="nav-id nav-id--sub" data-base="E4A">E4A</span>___photo</a>
+          <a href="film.html">#<span class="nav-id nav-id--sub" data-base="C9D">C9D</span>___video</a>
+          <a href="resume.html">#<span class="nav-id nav-id--sub" data-base="6E3">6E3</span>___resume</a>
+        </div>
+      </div>
+      <a href="about.html">#<span class="nav-id" data-base="7B3E90">7B3E90</span>____about</a>
+      <a href="contact.html">#<span class="nav-id" data-base="C9D1F6">C9D1F6</span>____contact</a>
+    </div>
+  </nav>
+
+  <main class="collection-page collection-hub">
+PLACEHOLDER
+  </main>
+
+  <footer><span>&copy; 2025 Owen Correll</span></footer>
+  <script src="scripts.js?v=27"></script>
+</body>
+</html>
+"""
+
+
+def ensure_hub_page(col: dict) -> Path:
+    slug = col["slug"]
+    page = ROOT / f"{slug}.html"
+    title = col.get("title", slug)
+    if not page.exists():
+        window, address, _ = hub_explorer_meta(col)
+        chrome = build_explorer_open(window, address, "photography.html")
+        page.write_text(
+            HUB_PAGE_SHELL.format(title=title.title()).replace(
+                "PLACEHOLDER", chrome + "\n"
+            )
+        )
+    return page
 
 
 def main() -> None:
@@ -250,44 +391,59 @@ def main() -> None:
     collections = data["collections"]
     excluded = set(data.get("excluded", []))
 
-    gallery = build_gallery(collections, excluded)
-    photo_html = ROOT / "photography.html"
-    html = photo_html.read_text()
-    m = re.search(r'    <div class="photo-gallery[^"]*">', html)
-    if not m:
-        raise SystemExit("photo-gallery block not found in photography.html")
-    start = m.start()
-    end = html.index("  <footersub>")
-    photo_html.write_text(html[:start] + gallery + "\n" + html[end:])
+    sync_photography_page(collections, excluded)
 
     for col in collections:
         if not is_photo_collection(col):
             continue
         slug = col["slug"]
-        page = ROOT / f"{slug}.html"
         subs = col.get("subcollections", [])
-        if subs and page.exists():
-            update_collection_header(page, col.get("title", slug), col.get("description", ""))
-            replace_hub_gallery(page, build_hub_gallery(subs))
+        if subs:
+            page = ensure_hub_page(col)
+            window, address, _ = hub_explorer_meta(col)
+            chrome = build_explorer_open(window, address, "photography.html")
+            rebuild_collection_main(page, chrome, build_hub_gallery(subs), hub=True)
             for sub in subs:
                 sub_page = ROOT / f'{sub["slug"]}.html'
-                if sub_page.exists():
-                    update_collection_header(
-                        sub_page,
-                        sub.get("title", sub["slug"]),
-                        sub.get("description", ""),
-                        back_href=f"{slug}.html",
+                if not sub_page.exists():
+                    continue
+                window, address = sub_explorer_meta(sub, col)
+                chrome = build_explorer_open(window, address, f"{slug}.html")
+                if sub.get("coverSrc") and not sub.get("photos"):
+                    src = sub["coverSrc"]
+                    title = sub.get("title", sub["slug"])
+                    caption = sub.get("caption", sub.get("description", "")).strip()
+                    caption_html = (
+                        f'\n        <p class="collection-media-caption">{caption}</p>'
+                        if caption
+                        else ""
                     )
-                    if sub.get("coverSrc") and not sub.get("photos"):
-                        update_collection_media(sub_page, sub)
-                    else:
-                        update_collection_stack(sub_page, sub["photos"])
+                    body = (
+                        f'    <div class="explorer-view explorer-view--media">\n'
+                        f'      <div class="collection-stack collection-stack--media">\n'
+                        f'        <figure class="collection-item collection-item--media">\n'
+                        f'          <img src="{src}" alt="{title}" loading="eager" decoding="async">\n'
+                        f"        </figure>{caption_html}\n"
+                        f"      </div>\n"
+                        f"    </div>\n"
+                        f'    <footer class="explorer-statusbar">\n'
+                        f'      <span class="explorer-statusbar-section">1 object</span>\n'
+                        f'      <span class="explorer-statusbar-section explorer-statusbar-grow">video</span>\n'
+                        f"    </footer>"
+                    )
+                    rebuild_collection_main(sub_page, chrome, body)
+                else:
+                    rebuild_collection_main(
+                        sub_page, chrome, build_photo_icon_stack(sub["photos"])
+                    )
             continue
+        page = ROOT / f"{slug}.html"
         if page.exists():
-            update_collection_header(
-                page, col.get("title", slug), col.get("description", "")
-            )
-            update_collection_stack(page, col["photos"])
+            title = col.get("title", slug)
+            window = f"{title} — Photos"
+            address = explorer_address_path(title)
+            chrome = build_explorer_open(window, address, "photography.html")
+            rebuild_collection_main(page, chrome, build_photo_icon_stack(col["photos"]))
 
     n = sum(1 for c in collections if is_photo_collection(c))
     print(f"OK: {n} collections synced")

@@ -2,7 +2,8 @@
   "collections": [
     {
       "slug": "commercial-work",
-      "title": "commercial work",
+      "title": "live & culture",
+      "description": "live music, artists, and nightlife coverage",
       "cover": 67,
       "preview": 78,
       "photos": [],
@@ -31,36 +32,46 @@
     },
     {
       "kind": "external-link",
-      "title": "WSN",
-      "description": "published work for NYU's independent student newspaper",
+      "title": "editorial & institutions",
+      "description": "Washington Square News — exhibition coverage, NYU",
       "href": "https://nyunews.com/staff_name/owen-correll/",
       "cover": 85
     },
     {
-      "slug": "stripling",
-      "title": "stripling",
-      "description": "documenting the energy of youth",
-      "cover": 2,
-      "photos": [2, 22, 30, 7, 9, 50, 14, 19, 32, 40, 66, 3]
-    },
-    {
       "slug": "portraiture",
-      "title": "portraiture",
+      "title": "portraits",
+      "description": "models and people on assignment",
       "cover": 6,
       "photos": [6, 1, 16, 27, 35, 38, 44, 64, 57, 51]
     },
     {
-      "slug": "decay",
-      "title": "decay",
-      "description": "my roots and rust",
-      "cover": 29,
-      "photos": [29, 13, 12, 24, 63, 8, 4, 11, 15, 31, 52, 65, 5, 54, 55, 37]
-    },
-    {
-      "slug": "other-works",
-      "title": "other works",
-      "cover": 20,
-      "photos": [20, 10, 17, 18, 21, 23, 25, 28, 33, 34, 39, 41, 42, 43, 45, 46, 47, 48, 49, 53, 56, 58, 59, 60, 61, 62]
+      "slug": "series-prints",
+      "title": "series & prints",
+      "description": "personal series and fine art",
+      "cover": 2,
+      "photos": [],
+      "subcollections": [
+        {
+          "slug": "stripling",
+          "title": "stripling",
+          "description": "documenting the energy of youth",
+          "cover": 2,
+          "photos": [2, 22, 30, 7, 9, 50, 14, 19, 32, 40, 66, 3]
+        },
+        {
+          "slug": "decay",
+          "title": "decay",
+          "description": "my roots and rust",
+          "cover": 29,
+          "photos": [29, 13, 12, 24, 63, 8, 4, 11, 15, 31, 52, 65, 5, 54, 55, 37]
+        },
+        {
+          "slug": "other-works",
+          "title": "other works",
+          "cover": 20,
+          "photos": [20, 10, 17, 18, 21, 23, 25, 28, 33, 34, 39, 41, 42, 43, 45, 46, 47, 48, 49, 53, 56, 58, 59, 60, 61, 62]
+        }
+      ]
     }
   ],
   "excluded": [26, 36, 85]

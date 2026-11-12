@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#1c1c1b">
   <meta name="description" content="Portraiture — photo collection by Owen Correll.">
   <title>Portraiture – Owen Correll</title>
-  <link rel="stylesheet" href="style.css?v=41">
+  <link rel="stylesheet" href="style.css?v=47">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -29,25 +29,69 @@
   </nav>
 
   <main class="collection-page">
-    <header class="collection-header">
-      <a href="photography.html" class="collection-back" aria-label="Back">←</a>
-      <p class="collection-title">portraiture</p>
-    </header>
-    <div class="collection-stack">
-      <figure class="collection-item"><span class="photo-index">6</span><img src="assets/view/6.jpg" alt="6" loading="eager" decoding="async"></figure>
-      <figure class="collection-item"><span class="photo-index">1</span><img src="assets/view/1.jpg" alt="1" loading="lazy" decoding="async"></figure>
-      <figure class="collection-item"><span class="photo-index">16</span><img src="assets/view/16.jpg" alt="16" loading="lazy" decoding="async"></figure>
-      <figure class="collection-item"><span class="photo-index">27</span><img src="assets/view/27.jpg" alt="27" loading="lazy" decoding="async"></figure>
-      <figure class="collection-item"><span class="photo-index">35</span><img src="assets/view/35.jpg" alt="35" loading="lazy" decoding="async"></figure>
-      <figure class="collection-item"><span class="photo-index">38</span><img src="assets/view/38.jpg" alt="38" loading="lazy" decoding="async"></figure>
-      <figure class="collection-item"><span class="photo-index">44</span><img src="assets/view/44.jpg" alt="44" loading="lazy" decoding="async"></figure>
-      <figure class="collection-item"><span class="photo-index">64</span><img src="assets/view/64.jpg" alt="64" loading="lazy" decoding="async"></figure>
-      <figure class="collection-item"><span class="photo-index">57</span><img src="assets/view/57.jpg" alt="57" loading="lazy" decoding="async"></figure>
-      <figure class="collection-item"><span class="photo-index">51</span><img src="assets/view/51.jpg" alt="51" loading="lazy" decoding="async"></figure>
+    <section class="explorer-window">
+      <header class="explorer-titlebar">
+        <span class="explorer-titlebar-text">portraits — Photos</span>
+      </header>
+      <div class="explorer-toolbar" role="toolbar">
+        <a href="photography.html" class="explorer-tool explorer-tool--back" aria-label="Back">←</a>
+      </div>
+      <p class="explorer-address">
+        <span class="explorer-address-label">Address</span>
+        <span class="explorer-address-path">C:/My Documents/Photos/portraits</span>
+      </p>
+<div class="explorer-view explorer-view--icons explorer-view--collection-photos">
+      <div class="collection-stack photo-gallery photo-gallery--icons photo-gallery--photos">
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">6</span>
+          <img src="assets/view/6.jpg" alt="Photograph 6" loading="eager" fetchpriority="high" decoding="async" data-full="assets/view/6.jpg" data-thumb="assets/view/6.jpg">
+        </div>
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">1</span>
+          <img src="assets/view/1.jpg" alt="Photograph 1" loading="eager" fetchpriority="high" decoding="async" data-full="assets/view/1.jpg" data-thumb="assets/view/1.jpg">
+        </div>
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">16</span>
+          <img src="assets/view/16.jpg" alt="Photograph 16" loading="eager" fetchpriority="high" decoding="async" data-full="assets/view/16.jpg" data-thumb="assets/view/16.jpg">
+        </div>
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">27</span>
+          <img src="assets/view/27.jpg" alt="Photograph 27" loading="eager" decoding="async" data-full="assets/view/27.jpg" data-thumb="assets/view/27.jpg">
+        </div>
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">35</span>
+          <img src="assets/view/35.jpg" alt="Photograph 35" loading="eager" decoding="async" data-full="assets/view/35.jpg" data-thumb="assets/view/35.jpg">
+        </div>
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">38</span>
+          <img src="assets/view/38.jpg" alt="Photograph 38" loading="eager" decoding="async" data-full="assets/view/38.jpg" data-thumb="assets/view/38.jpg">
+        </div>
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">44</span>
+          <img src="assets/view/44.jpg" alt="Photograph 44" loading="eager" decoding="async" data-full="assets/view/44.jpg" data-thumb="assets/view/44.jpg">
+        </div>
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">64</span>
+          <img src="assets/view/64.jpg" alt="Photograph 64" loading="eager" decoding="async" data-full="assets/view/64.jpg" data-thumb="assets/view/64.jpg">
+        </div>
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">57</span>
+          <img src="assets/view/57.jpg" alt="Photograph 57" loading="eager" decoding="async" data-full="assets/view/57.jpg" data-thumb="assets/view/57.jpg">
+        </div>
+        <div class="photo-cell explorer-item explorer-item--file">
+          <span class="photo-index">51</span>
+          <img src="assets/view/51.jpg" alt="Photograph 51" loading="lazy" decoding="async" data-full="assets/view/51.jpg" data-thumb="assets/view/51.jpg">
+        </div>
+      </div>
     </div>
+    <footer class="explorer-statusbar">
+      <span class="explorer-statusbar-section">10 object(s)</span>
+      <span class="explorer-statusbar-section explorer-statusbar-grow">double-click to open</span>
+    </footer>
+    </section>
   </main>
 
   <footer><span>&copy; 2025 Owen Correll</span></footer>
-  <script src="scripts.js?v=26"></script>
+  <script src="scripts.js?v=27"></script>
 </body>
 </html>

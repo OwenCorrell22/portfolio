@@ -7,6 +7,8 @@ from typing import Optional
 
 ROOT = Path(__file__).resolve().parent
 EXPLORER_ROOT = "C:/My Documents/Photos"
+STYLE_VERSION = 53
+SCRIPT_VERSION = 28
 
 
 def load_attrs(i: int) -> str:
@@ -177,59 +179,6 @@ def build_explorer_open(window_title: str, address: str, back_href: str) -> str:
     )
 
 
-def migrate_hub_to_explorer(path: Path, col: dict) -> None:
-    text = path.read_text()
-    if 'class="explorer-window"' in text:
-        return
-    window, address, _ = hub_explorer_meta(col)
-    chrome = build_explorer_open(window, address, "photography.html")
-    text = re.sub(
-        r"    <header class=\"collection-header\">.*?</header>\n?",
-        "",
-        text,
-        count=1,
-        flags=re.DOTALL,
-    )
-    text = re.sub(
-        r'(<main class="collection-page)(?: collection-hub)?">\n',
-        r'\1 collection-hub">\n' + chrome + "\n",
-        text,
-        count=1,
-    )
-    path.write_text(text)
-
-
-def replace_hub_content(path: Path, body_html: str) -> None:
-    text = path.read_text()
-    body = body_html.strip()
-    if 'class="explorer-view"' in text:
-        text = re.sub(
-            r"    <div class=\"explorer-view explorer-view--icons\">.*?"
-            r"    </footer>\n(?:    </section>\n)?",
-            body + "\n",
-            text,
-            count=1,
-            flags=re.DOTALL,
-        )
-    elif re.search(r'class="photo-gallery photo-gallery', text):
-        text = re.sub(
-            r"\s*<div class=\"photo-gallery photo-gallery[^\"]*\">.*?(?=\s*</main>)",
-            "\n" + body + "\n",
-            text,
-            count=1,
-            flags=re.DOTALL,
-        )
-    elif 'class="explorer-window"' in text:
-        text = text.replace("  </main>", body + "\n  </main>", 1)
-    if "collection-hub" not in text and "collection-page" in text:
-        text = text.replace(
-            '<main class="collection-page">',
-            '<main class="collection-page collection-hub">',
-            1,
-        )
-    path.write_text(text)
-
-
 def rebuild_collection_main(
     path: Path, chrome: str, body_html: str, *, hub: bool = False
 ) -> None:
@@ -252,14 +201,14 @@ def rebuild_collection_main(
     path.write_text(text)
 
 
-def update_collection_media(path: Path, sub: dict, back_href: str) -> None:
+def build_media_body(sub: dict) -> str:
     src = sub["coverSrc"]
     title = sub.get("title", sub["slug"])
     caption = sub.get("caption", sub.get("description", "")).strip()
     caption_html = (
         f'\n        <p class="collection-media-caption">{caption}</p>' if caption else ""
     )
-    body = (
+    return (
         f'    <div class="explorer-view explorer-view--media">\n'
         f'      <div class="collection-stack collection-stack--media">\n'
         f'        <figure class="collection-item collection-item--media">\n'
@@ -272,7 +221,6 @@ def update_collection_media(path: Path, sub: dict, back_href: str) -> None:
         f'      <span class="explorer-statusbar-section explorer-statusbar-grow">video</span>\n'
         f"    </footer>"
     )
-    # caller must rebuild main with chrome + body
 
 
 def sync_photography_page(collections: list, excluded: set[int]) -> None:
@@ -339,7 +287,7 @@ HUB_PAGE_SHELL = """<!DOCTYPE html>
   <meta name="theme-color" content="#1c1c1b">
   <meta name="description" content="{title} — photo collection by Owen Correll.">
   <title>{title} – Owen Correll</title>
-  <link rel="stylesheet" href="style.css?v=42">
+  <link rel="stylesheet" href="style.css?v={STYLE_VERSION}">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -365,7 +313,7 @@ PLACEHOLDER
   </main>
 
   <footer><span>&copy; 2025 Owen Correll</span></footer>
-  <script src="scripts.js?v=27"></script>
+  <script src="scripts.js?v={SCRIPT_VERSION}"></script>
 </body>
 </html>
 """
@@ -379,9 +327,11 @@ def ensure_hub_page(col: dict) -> Path:
         window, address, _ = hub_explorer_meta(col)
         chrome = build_explorer_open(window, address, "photography.html")
         page.write_text(
-            HUB_PAGE_SHELL.format(title=title.title()).replace(
-                "PLACEHOLDER", chrome + "\n"
-            )
+            HUB_PAGE_SHELL.format(
+                title=title.title(),
+                STYLE_VERSION=STYLE_VERSION,
+                SCRIPT_VERSION=SCRIPT_VERSION,
+            ).replace("PLACEHOLDER", chrome + "\n")
         )
     return page
 
@@ -410,28 +360,9 @@ def main() -> None:
                 window, address = sub_explorer_meta(sub, col)
                 chrome = build_explorer_open(window, address, f"{slug}.html")
                 if sub.get("coverSrc") and not sub.get("photos"):
-                    src = sub["coverSrc"]
-                    title = sub.get("title", sub["slug"])
-                    caption = sub.get("caption", sub.get("description", "")).strip()
-                    caption_html = (
-                        f'\n        <p class="collection-media-caption">{caption}</p>'
-                        if caption
-                        else ""
+                    rebuild_collection_main(
+                        sub_page, chrome, build_media_body(sub)
                     )
-                    body = (
-                        f'    <div class="explorer-view explorer-view--media">\n'
-                        f'      <div class="collection-stack collection-stack--media">\n'
-                        f'        <figure class="collection-item collection-item--media">\n'
-                        f'          <img src="{src}" alt="{title}" loading="eager" decoding="async">\n'
-                        f"        </figure>{caption_html}\n"
-                        f"      </div>\n"
-                        f"    </div>\n"
-                        f'    <footer class="explorer-statusbar">\n'
-                        f'      <span class="explorer-statusbar-section">1 object</span>\n'
-                        f'      <span class="explorer-statusbar-section explorer-statusbar-grow">video</span>\n'
-                        f"    </footer>"
-                    )
-                    rebuild_collection_main(sub_page, chrome, body)
                 else:
                     rebuild_collection_main(
                         sub_page, chrome, build_photo_icon_stack(sub["photos"])

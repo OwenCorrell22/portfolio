@@ -80,13 +80,16 @@ def build_gallery_entries(
             else ""
         )
         lines.append(
-            f'      <a href="{slug}.html" class="photo-collection-entry">\n'
+            f'      <div class="photo-collection-block">\n'
             f'        <span class="photo-collection-title">{title}</span>{desc_html}\n'
-            f'        <span class="photo-collection-card">\n'
+            f'        <a href="{slug}.html" class="photo-collection-card-link" '
+            f'aria-label="{title}">\n'
+            f'          <span class="photo-collection-card">\n'
             f'          <img src="{cover_src}" alt="{title} collection"{load_attrs(idx)} '
             f'decoding="async" class="photo-collection-cover visible">{preview_html}\n'
-            f"        </span>\n"
-            f"      </a>"
+            f"          </span>\n"
+            f"        </a>\n"
+            f"      </div>"
         )
         idx += 1
     return lines, idx

@@ -7,7 +7,7 @@ from typing import Optional
 
 ROOT = Path(__file__).resolve().parent
 EXPLORER_ROOT = "C:/My Documents/Photos"
-STYLE_VERSION = 54
+STYLE_VERSION = 55
 SCRIPT_VERSION = 28
 
 
@@ -186,7 +186,7 @@ def build_explorer_open(window_title: str, address: str, back_href: str) -> str:
         f'        <span class="explorer-titlebar-text">{window_title}</span>\n'
         f"      </header>\n"
         f'      <div class="explorer-toolbar" role="toolbar">\n'
-        f'        <a href="{back_href}" class="explorer-tool explorer-tool--back" aria-label="Back">←</a>\n'
+        f'        <a href="{back_href}" class="explorer-tool explorer-tool--back" aria-label="Back">Back</a>\n'
         f"      </div>\n"
         f'      <p class="explorer-address">\n'
         f'        <span class="explorer-address-label">Address</span>\n'

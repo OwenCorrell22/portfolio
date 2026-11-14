@@ -58,6 +58,7 @@ html {
 
 body {
   font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-style: normal;
   background-color: var(--c-bg);
   color: var(--c-text);
   font-size: 1rem;
@@ -67,6 +68,10 @@ body {
 }
 
 a { text-decoration: none; color: inherit; }
+
+em, i {
+  font-style: normal;
+}
 
 .contact-list a, .archive-sidebar a {
   transition: opacity var(--t-fast), transform var(--t-fast);
@@ -473,13 +478,13 @@ main.site-page {
 }
 
 .explorer-tool--back {
-  font-size: 1.15rem;
-  line-height: 1;
-  min-width: 2rem;
-  padding-left: 0.45rem;
-  padding-right: 0.45rem;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  min-width: 2.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   text-transform: none;
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
 }
 
 .explorer-window-desc {
@@ -625,12 +630,6 @@ main.site-page {
   outline: none;
 }
 
-.explorer-item--external .explorer-item-label::after {
-  content: " ↗";
-  font-size: 0.62rem;
-  opacity: 0.65;
-}
-
 .explorer-item-icon {
   position: relative;
   display: flex;
@@ -685,7 +684,6 @@ main.site-page {
   font-size: 0.65rem;
   line-height: 1.35;
   color: var(--c-text-muted);
-  font-style: italic;
 }
 
 .photo-page .explorer-item-desc {
@@ -722,7 +720,6 @@ main.site-page {
   text-align: left;
   color: var(--c-text-muted);
   letter-spacing: 0.1em;
-  font-style: italic;
 }
 
 .resume-container {

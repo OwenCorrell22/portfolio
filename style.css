@@ -280,6 +280,33 @@ em, i {
   outline: none;
 }
 
+/* ── Slideshow nav arrows ── */
+.slideshow-nav {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: flex-end;
+  padding-inline: var(--page-inline);
+  padding-block: var(--space-xs) var(--space-md);
+  flex-shrink: 0;
+}
+
+.slideshow-nav__btn {
+  background: none;
+  border: none;
+  color: var(--site-text);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.slideshow-nav__btn:hover,
+.slideshow-nav__btn:focus-visible {
+  color: var(--site-text-hover);
+  outline: none;
+}
+
 /* ── Lightbox ── */
 .lightbox {
   display: none;

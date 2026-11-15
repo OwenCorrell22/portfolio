@@ -13,17 +13,20 @@
   }
 
   function initHomeSlideshow() {
-    var root = document.querySelector('[data-home-slideshow], .site-pane--home[data-home-slideshow]');
+    var root = document.querySelector('[data-home-slideshow]');
     if (!root) return;
 
-    var photoIds = [29, 68, 1, 78, 52, 5, 2, 22];
-    var intervalMs = parseInt(root.getAttribute('data-interval'), 10) || 3000;
+    var photoIds = [29, 5, 52, 2, 22, 1, 78];
+    var intervalMs = parseInt(root.getAttribute('data-interval'), 10) || 2500;
     var layerA = root.querySelector('.home-slideshow__layer--a');
     var layerB = root.querySelector('.home-slideshow__layer--b');
+    var btnPrev = document.getElementById('slideshow-prev');
+    var btnNext = document.getElementById('slideshow-next');
     if (!layerA || !layerB || !photoIds.length) return;
 
     var index = 0;
     var useA = true;
+    var timer = null;
 
     function srcFor(id) {
       return 'assets/view/' + id + '.jpg';
@@ -33,27 +36,14 @@
       img.alt = 'Photograph ' + id + ' by Owen Correll';
     }
 
+    // Show initial photo
     layerA.src = srcFor(photoIds[0]);
     setAlt(layerA, photoIds[0]);
     layerA.classList.add('is-visible');
     layerB.classList.remove('is-visible');
 
-    if (prefersReducedMotion()) return;
-
-    var timer = setInterval(advance, intervalMs);
-
-    document.addEventListener('visibilitychange', function () {
-      if (document.hidden) {
-        clearInterval(timer);
-        timer = null;
-      } else if (!timer) {
-        timer = setInterval(advance, intervalMs);
-      }
-    });
-
-    function advance() {
-      index = (index + 1) % photoIds.length;
-      var id = photoIds[index];
+    function showIndex(newIndex) {
+      var id = photoIds[newIndex];
       var next = useA ? layerB : layerA;
       var current = useA ? layerA : layerB;
       var preload = new Image();
@@ -66,6 +56,48 @@
       };
       preload.src = srcFor(id);
     }
+
+    function advance() {
+      index = (index + 1) % photoIds.length;
+      showIndex(index);
+    }
+
+    function retreat() {
+      index = (index - 1 + photoIds.length) % photoIds.length;
+      showIndex(index);
+    }
+
+    function resetTimer() {
+      if (timer) clearInterval(timer);
+      timer = setInterval(advance, intervalMs);
+    }
+
+    if (!prefersReducedMotion()) {
+      timer = setInterval(advance, intervalMs);
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+          clearInterval(timer);
+          timer = null;
+        } else if (!timer) {
+          timer = setInterval(advance, intervalMs);
+        }
+      });
+    }
+
+    if (btnPrev) {
+      btnPrev.addEventListener('click', function () {
+        retreat();
+        if (!prefersReducedMotion()) resetTimer();
+      });
+    }
+
+    if (btnNext) {
+      btnNext.addEventListener('click', function () {
+        advance();
+        if (!prefersReducedMotion()) resetTimer();
+      });
+    }
   }
 
   /* ── Lightbox ── */
@@ -74,7 +106,6 @@
     var grid = document.querySelector('.photo-grid');
     if (!grid) return;
 
-    // Build overlay
     var overlay = document.createElement('div');
     overlay.className = 'lightbox';
     overlay.setAttribute('role', 'dialog');
@@ -102,19 +133,16 @@
       img.src = '';
     }
 
-    // Click grid images to open
     grid.addEventListener('click', function (e) {
       var target = e.target.closest('.photo-grid__item');
       if (!target) return;
       open(target.src, target.alt);
     });
 
-    // Click overlay (outside image) or image to close
     overlay.addEventListener('click', function () {
       close();
     });
 
-    // Keyboard close
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && overlay.classList.contains('is-open')) {
         close();

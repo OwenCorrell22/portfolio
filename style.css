@@ -106,7 +106,6 @@ em, i {
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--site-text);
-  transition: color var(--t-fast);
 }
 
 .site-name:hover,
@@ -139,7 +138,6 @@ em, i {
 .site-nav__link {
   color: var(--site-text);
   width: fit-content;
-  transition: color var(--t-fast);
   text-transform: lowercase;
 }
 
@@ -274,7 +272,6 @@ em, i {
 .contact-list a {
   color: var(--site-text);
   width: fit-content;
-  transition: color var(--t-fast);
 }
 
 .contact-list a:hover,
@@ -322,7 +319,6 @@ em, i {
   line-height: 1;
   color: var(--site-text);
   width: fit-content;
-  transition: color var(--t-fast);
 }
 
 .rail-context__back:hover,
@@ -370,7 +366,6 @@ em, i {
   flex-direction: column;
   gap: var(--space-xs);
   color: var(--site-text);
-  transition: color var(--t-fast);
 }
 
 .collection-tile:hover,
@@ -418,7 +413,6 @@ em, i {
   cursor: zoom-in;
   outline: 2px solid transparent;
   outline-offset: 0px;
-  transition: outline-color var(--t-fast);
 }
 
 .photo-grid__item:hover {

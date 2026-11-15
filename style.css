@@ -45,6 +45,18 @@ html {
   scroll-behavior: smooth;
   background-color: var(--site-bg);
   color: var(--site-text);
+  scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.site-pane--scroll::-webkit-scrollbar {
+  display: none; /* Chrome / Safari / iOS */
+}
+
+.site-pane--scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 body {
@@ -73,8 +85,7 @@ em, i {
 }
 
 .site-layout--home {
-  overflow: hidden;
-  height: 100dvh;
+  /* desktop-only lock applied in the min-width query below */
 }
 
 .site-rail {
@@ -443,35 +454,86 @@ em, i {
   }
 }
 
+/* ── Desktop: lock home to viewport ── */
+@media (min-width: 48.0625rem) {
+  .site-layout--home {
+    overflow: hidden;
+    height: 100dvh;
+  }
+}
+
+/* ── Mobile (portrait & small landscape) ── */
 @media (max-width: 48rem) {
+  :root {
+    --font-size-name: clamp(1.25rem, 5vw, 1.6rem);
+    --page-inline: var(--space-md);
+    --page-block: var(--space-lg);
+  }
+
   .site-layout {
     flex-direction: column;
   }
 
+  /* Rail goes full-width across the top */
   .site-rail {
     flex: none;
     width: 100%;
+    padding-block: var(--space-md) var(--space-md);
+    padding-inline: var(--space-md);
   }
 
+  /* Rail context sits inline after nav on mobile — keep it compact */
+  .rail-context {
+    margin-top: var(--space-lg);
+  }
+
+  /* Content panes: auto height, no viewport lock */
+  .site-pane {
+    min-height: unset;
+  }
+
+  /* Home: slideshow gets a fixed viewport slice */
+  .site-pane--home {
+    height: 58dvh;
+    min-height: unset;
+  }
+
+  /* Allow home page to scroll past the slideshow */
   .site-layout--home {
     height: auto;
-    min-height: 100dvh;
+    overflow: visible;
   }
 
-  .site-pane--home {
-    min-height: min(55dvh, 28rem);
-  }
-
+  /* Scroll panes: tighter top padding since rail is above */
   .site-pane--scroll {
-    padding-block-start: var(--space-sm);
+    padding-block-start: var(--space-md);
+    padding-block-end: var(--space-2xl);
   }
 
+  /* Contact: stack naturally, don't center in full viewport */
   .site-pane--contact {
     justify-content: flex-start;
-    padding-block-start: var(--space-xl);
+    padding-block: var(--space-xl) var(--space-2xl);
   }
 
   .contact-list {
+    margin-block: 0;
     margin-inline: 0;
+  }
+
+  /* Photo grid: single column on small screens */
+  .photo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Collection grid already 1 col, just tighten gap */
+  .collection-grid {
+    gap: var(--space-xl);
+  }
+
+  /* Lightbox: full bleed on mobile */
+  .lightbox__img {
+    max-width: 100vw;
+    max-height: 90dvh;
   }
 }

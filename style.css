@@ -125,6 +125,8 @@ em, i {
   font-weight: 400;
   line-height: var(--line-height-nav);
   letter-spacing: 0.06em;
+  padding-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--site-text);
 }
 
 .site-nav__label {

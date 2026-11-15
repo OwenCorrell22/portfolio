@@ -4,9 +4,9 @@
   --site-text-hover: #8c8c8a;
   --site-muted: #a8a8a6;
 
-  --font-size-name: clamp(1.45rem, 2.2vw + 0.5rem, 1.9rem);
-  --font-size-body: clamp(1rem, 0.25vw + 0.95rem, 1.125rem);
-  --font-size-heading: clamp(0.9rem, 0.15vw + 0.85rem, 1rem);
+  --font-size-name: clamp(1.2rem, 2vw + 0.4rem, 1.6rem);
+  --font-size-body: clamp(0.8rem, 0.2vw + 0.78rem, 0.95rem);
+  --font-size-heading: clamp(0.72rem, 0.12vw + 0.7rem, 0.82rem);
 
   --line-height-tight: 1.35;
   --line-height-body: 1.65;

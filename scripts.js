@@ -119,12 +119,17 @@
     overlay.appendChild(img);
     document.body.appendChild(overlay);
 
+    // Guard: prevent the same interaction that opens the lightbox
+    // from immediately closing it (common on touch devices).
+    var justOpened = false;
+
     function open(src, alt) {
       img.src = src;
       img.alt = alt || '';
       overlay.classList.add('is-open');
       document.body.style.overflow = 'hidden';
-      overlay.focus();
+      justOpened = true;
+      setTimeout(function () { justOpened = false; }, 300);
     }
 
     function close() {
@@ -133,13 +138,34 @@
       img.src = '';
     }
 
+    // Open on click/tap of a grid photo; stop event from bubbling further
     grid.addEventListener('click', function (e) {
       var target = e.target.closest('.photo-grid__item');
       if (!target) return;
+      e.stopPropagation();
+      e.preventDefault();
       open(target.src, target.alt);
     });
 
-    overlay.addEventListener('click', function () {
+    // Also handle touchend for more reliable mobile response
+    grid.addEventListener('touchend', function (e) {
+      var target = e.target.closest('.photo-grid__item');
+      if (!target) return;
+      e.stopPropagation();
+      e.preventDefault();
+      open(target.src, target.alt);
+    });
+
+    // Close on tap/click of overlay — but not the same event that opened it
+    overlay.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (justOpened) return;
+      close();
+    });
+
+    overlay.addEventListener('touchend', function (e) {
+      e.stopPropagation();
+      if (justOpened) return;
       close();
     });
 

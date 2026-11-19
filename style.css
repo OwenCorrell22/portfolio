@@ -280,6 +280,63 @@ em, i {
   outline: none;
 }
 
+/* ── Resume dropdown ── */
+.resume-toggle {
+  width: fit-content;
+}
+
+/* Hide default browser disclosure triangle */
+.resume-toggle > summary {
+  list-style: none;
+  cursor: pointer;
+  color: var(--site-text);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: inherit;
+  letter-spacing: 0.03em;
+  width: fit-content;
+}
+
+.resume-toggle > summary::-webkit-details-marker {
+  display: none;
+}
+
+.resume-toggle > summary::marker {
+  display: none;
+}
+
+.resume-toggle[open] > summary,
+.resume-toggle > summary:hover {
+  color: var(--site-text-hover);
+}
+
+.resume-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+  width: min(100%, 44rem);
+}
+
+.resume-preview {
+  width: 100%;
+  height: 70vh;
+  border: none;
+  display: block;
+  background: var(--site-bg);
+}
+
+.resume-download {
+  color: var(--site-text);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: inherit;
+  letter-spacing: 0.03em;
+  width: fit-content;
+}
+
+.resume-download:hover {
+  color: var(--site-text-hover);
+}
+
 /* ── Slideshow nav arrows ── */
 .slideshow-nav {
   display: flex;
